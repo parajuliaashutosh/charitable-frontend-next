@@ -13,7 +13,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Charitable",
+  title: "Give Hope - Charitable Donations Platform",
   description: "A platform to help you find and support charitable causes.",
 };
 
