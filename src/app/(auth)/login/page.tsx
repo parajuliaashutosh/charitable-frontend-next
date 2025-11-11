@@ -1,4 +1,3 @@
-// app/login/page.tsx
 "use client";
 
 import authServiceRequests from "@/src/transport/gateway/gRPC/requests/auth/auth-requests";
