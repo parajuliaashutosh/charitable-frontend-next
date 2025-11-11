@@ -18,7 +18,7 @@ export class InterceptorRegistry {
     return this.instance;
   }
 
-  public static getInterceptor(protocol: Protocol): RpcInterceptor {
+  public static getInterceptor(protocol: Protocol): unknown {
     const interceptor = this.interceptors.get(protocol);
     if (!interceptor) {
       throw new Error(`No interceptor found for protocol: ${protocol}`);

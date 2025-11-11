@@ -51,14 +51,14 @@ export default function LoginPage() {
 
       console.log("Login response:", response);
 
-      if (response.success) {
+      if (response?.success) {
         // Store tokens
         // localStorage.setItem("accessToken", result.data.accessToken);
         // localStorage.setItem("refreshToken", result.data.refreshToken);
         // Redirect to dashboard or home
         // window.location.href = "/dashboard";
       } else {
-        setError(result.message || "Login failed. Please try again.");
+        setError(response?.message || "Login failed. Please try again.");
       }
     } catch (err) {
       console.log("Login error:", err);

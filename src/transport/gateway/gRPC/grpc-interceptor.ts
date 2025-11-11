@@ -1,13 +1,13 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import {
-    ClientStreamingCall,
-    DuplexStreamingCall,
-    MethodInfo,
-    RpcError,
-    RpcInterceptor,
-    RpcOptions,
-    ServerStreamingCall,
-    UnaryCall
+  ClientStreamingCall,
+  DuplexStreamingCall,
+  MethodInfo,
+  RpcError,
+  RpcInterceptor,
+  RpcOptions,
+  ServerStreamingCall,
+  UnaryCall,
 } from "@protobuf-ts/runtime-rpc";
 
 type Protocol = "grpc" | "rest";
@@ -46,7 +46,7 @@ const DEFAULT_RETRY_CONFIG: RetryConfig = {
   initialDelayMs: 1000,
   maxDelayMs: 30000,
   backoffMultiplier: 2,
-  retryableStatusCodes: ["UNAVAILABLE", "DEADLINE_EXCEEDED", "UNKNOWN"]
+  retryableStatusCodes: ["UNAVAILABLE", "DEADLINE_EXCEEDED", "UNKNOWN"],
 };
 
 const DEFAULT_LOG_CONFIG: LogConfig = {
@@ -55,7 +55,7 @@ const DEFAULT_LOG_CONFIG: LogConfig = {
   logErrors: true,
   logger: (message: string, data?: any) => {
     console.log(message, data ? JSON.stringify(data, null, 2) : "");
-  }
+  },
 };
 
 // Type-safe gRPC Interceptor
@@ -92,28 +92,32 @@ export class GrpcRetryLoggingInterceptor implements RpcInterceptor {
     return Math.floor(delay + jitter);
   }
 
-  private shouldRetry(error: RpcError, attempt: number, maxRetries: number): boolean {
+  private shouldRetry(
+    error: RpcError,
+    attempt: number,
+    maxRetries: number
+  ): boolean {
     if (attempt >= maxRetries) {
       return false;
     }
 
     const statusCode = error.code;
-    return (
-      this.retryConfig.retryableStatusCodes?.includes(statusCode) ?? false
-    );
+    return this.retryConfig.retryableStatusCodes?.includes(statusCode) ?? false;
   }
 
   private getRetryConfig(options: RpcOptions): RetryConfig {
     // Check if there's a per-request retry config in meta
-    const perRequestConfig = options.meta?.[RETRY_CONFIG_META_KEY] as PerRequestRetryConfig | undefined;
-    
+    const perRequestConfig = options.meta?.[RETRY_CONFIG_META_KEY] as
+      | PerRequestRetryConfig
+      | undefined;
+
     if (perRequestConfig) {
       return {
         ...this.retryConfig,
-        ...perRequestConfig
+        ...perRequestConfig,
       };
     }
-    
+
     return this.retryConfig;
   }
 
@@ -122,24 +126,23 @@ export class GrpcRetryLoggingInterceptor implements RpcInterceptor {
     method: MethodInfo,
     input: object,
     options: RpcOptions
-  ): UnaryCall {
+  ): Promise<any> {
+    // <- change return type to Promise of payload
     if (this.logConfig.logRequests) {
-      this.log(`[gRPC Request] ${method.service.typeName}.${method.name}`, {
-        input,
-        options
-      });
+      this.log(
+        `[gRPC Request] ${method.service.typeName}.${method.name}`,
+        input
+      );
     }
 
-    // Get retry config (either per-request or default)
     const retryConfig = this.getRetryConfig(options);
-    
     let attempt = 0;
     const startTime = Date.now();
 
-    const makeCall = async (): Promise<UnaryCall> => {
+    const makeCall = async (): Promise<any> => {
       try {
-        const call = next(method, input, options);
-        const response = await call.response;
+        const call: UnaryCall<any, any> = next(method, input, options);
+        const response = await call.response; // this is the actual payload
 
         if (this.logConfig.logResponses) {
           this.log(
@@ -147,12 +150,12 @@ export class GrpcRetryLoggingInterceptor implements RpcInterceptor {
             {
               response,
               durationMs: Date.now() - startTime,
-              attempts: attempt + 1
+              attempts: attempt + 1,
             }
           );
         }
 
-        return call;
+        return response; // ✅ only the payload
       } catch (error) {
         const rpcError = error as RpcError;
 
@@ -164,7 +167,6 @@ export class GrpcRetryLoggingInterceptor implements RpcInterceptor {
             {
               error: rpcError.message,
               code: rpcError.code,
-              metadata: rpcError.meta
             }
           );
         }
@@ -185,7 +187,7 @@ export class GrpcRetryLoggingInterceptor implements RpcInterceptor {
       }
     };
 
-    return makeCall() as UnaryCall;
+    return makeCall(); // ✅ returns Promise of payload directly
   }
 
   // For streaming calls, we don't retry but still log
@@ -205,16 +207,15 @@ export class GrpcRetryLoggingInterceptor implements RpcInterceptor {
     const call = next(method, input, options);
 
     if (this.logConfig.logErrors) {
-      call.status
-        .catch((error: RpcError) => {
-          this.log(
-            `[gRPC ServerStreaming Error] ${method.service.typeName}.${method.name}`,
-            {
-              error: error.message,
-              code: error.code
-            }
-          );
-        });
+      call.status.catch((error: RpcError) => {
+        this.log(
+          `[gRPC ServerStreaming Error] ${method.service.typeName}.${method.name}`,
+          {
+            error: error.message,
+            code: error.code,
+          }
+        );
+      });
     }
 
     return call;
