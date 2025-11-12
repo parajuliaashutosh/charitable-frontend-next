@@ -1,3 +1,4 @@
+import { LucideEye, LucideEyeOff } from 'lucide-react'
 import * as React from 'react'
 import { FieldError } from 'react-hook-form'
 import { FormError, FormLabel } from './form'
@@ -60,9 +61,9 @@ const Input = React.memo(
             style={{
               display: type === 'password' ? 'flex' : 'none',
             }}
-            className='items-center h-[32px] cursor-pointer'
+            className='items-center h-8 cursor-pointer'
           >
-            {show ? <LuEye /> : <LuEyeOff />}
+            {show ? <LucideEye /> : <LucideEyeOff />}
           </div>
         </div>
         <FormError error={error?.message} />

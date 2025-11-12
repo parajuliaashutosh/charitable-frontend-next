@@ -1,51 +1,68 @@
 // src/app/(auth)/login/login-form.tsx
 "use client";
 
+import { loginSchema } from "@/src/schema/auth.schema";
 import authServiceRequests from "@/src/transport/gateway/gRPC/requests/auth/auth-requests";
 import { LoginResponse } from "@/src/transport/gateway/gRPC/stubs/exposed-auth";
-import { Eye, EyeOff, Heart } from "lucide-react";
+import { yupResolver } from "@hookform/resolvers/yup";
+import { Heart } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
+import { Button } from "../ui/button";
+import { Input } from "../ui/input";
 
-interface LoginFormData {
+interface ILoginFormData {
   username: string;
   password: string;
 }
 
 export default function LoginForm() {
   const router = useRouter();
-  
-  const [showPassword, setShowPassword] = useState(false);
+
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+
+  const defaultValues: ILoginFormData = {
+    username: "",
+    password: "",
+  };
 
   const {
     register,
     handleSubmit,
-    formState: { errors },
-  } = useForm<LoginFormData>();
+    formState: { errors, isSubmitting },
+  } = useForm({
+    resolver: yupResolver(loginSchema),
+    defaultValues,
+  });
 
-  const onSubmit = async (data: LoginFormData) => {
+  const onSubmit = async (data: ILoginFormData) => {
     setIsLoading(true);
     setError(null);
 
     try {
-      const response = await authServiceRequests.login(
+      const response = (await authServiceRequests.login(
         {
           username: data.username,
           password: data.password,
         },
         0
-      ) as LoginResponse;
+      )) as LoginResponse;
 
       if (response?.success) {
         // Store tokens in memory or cookies instead of localStorage
         // Note: localStorage is not ideal for tokens, consider using httpOnly cookies
-        if (typeof window !== 'undefined') {
-          sessionStorage.setItem("accessToken", response?.data?.accessToken ?? "");
-          sessionStorage.setItem("refreshToken", response?.data?.refreshToken ?? "");
+        if (typeof window !== "undefined") {
+          sessionStorage.setItem(
+            "accessToken",
+            response?.data?.accessToken ?? ""
+          );
+          sessionStorage.setItem(
+            "refreshToken",
+            response?.data?.refreshToken ?? ""
+          );
         }
         router.push("/dashboard");
       } else {
@@ -61,7 +78,7 @@ export default function LoginForm() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center px-4 py-12">
+    <div className="min-h-screen flex items-center justify-center px-0 md:px-4 py-12">
       <div className="w-full max-w-md">
         {/* Logo/Brand */}
         <div className="text-center mb-8">
@@ -95,61 +112,26 @@ export default function LoginForm() {
               >
                 Email or Phone Number
               </label>
-              <input
+              <Input
                 id="username"
                 type="text"
-                {...register("username", {
-                  required: "Username is required",
-                })}
+                {...register("username")}
+                error={errors?.username}
                 className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-600 focus:border-transparent transition-all outline-none"
                 placeholder="Enter your email or phone"
               />
-              {errors.username && (
-                <p className="mt-1 text-sm text-red-600">
-                  {errors.username.message}
-                </p>
-              )}
             </div>
 
             {/* Password Field */}
             <div>
-              <label
-                htmlFor="password"
-                className="block text-sm font-medium text-gray-700 mb-2"
-              >
-                Password
-              </label>
-              <div className="relative">
-                <input
-                  id="password"
-                  type={showPassword ? "text" : "password"}
-                  {...register("password", {
-                    required: "Password is required",
-                    minLength: {
-                      value: 6,
-                      message: "Password must be at least 6 characters",
-                    },
-                  })}
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-600 focus:border-transparent transition-all outline-none pr-12"
-                  placeholder="Enter your password"
-                />
-                <button
-                  type="button"
-                  onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-700"
-                >
-                  {showPassword ? (
-                    <EyeOff className="w-5 h-5" />
-                  ) : (
-                    <Eye className="w-5 h-5" />
-                  )}
-                </button>
-              </div>
-              {errors.password && (
-                <p className="mt-1 text-sm text-red-600">
-                  {errors.password.message}
-                </p>
-              )}
+              <Input
+                id="password"
+                type="password"
+                {...register("password")}
+                error={errors?.password}
+                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-600 focus:border-transparent transition-all outline-none"
+                placeholder="Enter your password"
+              />
             </div>
 
             {/* Remember Me & Forgot Password */}
@@ -170,7 +152,7 @@ export default function LoginForm() {
             </div>
 
             {/* Submit Button */}
-            <button
+            {/* <button
               type="submit"
               disabled={isLoading}
               className="w-full bg-blue-600 text-white py-3 rounded-lg font-semibold hover:bg-blue-700 transition-all disabled:opacity-50 disabled:cursor-not-allowed shadow-lg hover:shadow-xl transform hover:scale-[1.02]"
@@ -198,7 +180,11 @@ export default function LoginForm() {
               ) : (
                 "Sign In"
               )}
-            </button>
+            </button> */}
+
+            <Button type="submit" variant="default" disabled={isSubmitting} className="w-full">
+              {isSubmitting ? "Signing in..." : "Sign In"}
+            </Button>
           </form>
 
           {/* Divider */}
