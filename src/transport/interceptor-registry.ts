@@ -1,15 +1,18 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
-import { RpcInterceptor } from "@protobuf-ts/runtime-rpc";
+import { GrpcInterceptorWrapper } from "./gateway/gRPC/grpc-interceptor-wrapper";
 
 type Protocol = "grpc" | "rest";
-
 
 // Updated InterceptorRegistry with type safety
 export class InterceptorRegistry {
   private static instance: InterceptorRegistry;
-  private static interceptors: Map<Protocol, RpcInterceptor> = new Map();
+  private readonly interceptors: Record<Protocol, unknown>;
 
-  private constructor() {}
+  private constructor() {
+    this.interceptors = {
+      grpc: new GrpcInterceptorWrapper(),
+      rest: new GrpcInterceptorWrapper(),
+    };
+  }
 
   public static getInstance(): InterceptorRegistry {
     if (this.instance == null) {
@@ -18,23 +21,12 @@ export class InterceptorRegistry {
     return this.instance;
   }
 
-  public static getInterceptor(protocol: Protocol): unknown {
-    const interceptor = this.interceptors.get(protocol);
+  public getInterceptor(protocol: Protocol): unknown {
+    const interceptor = this.interceptors[protocol];
     if (!interceptor) {
       throw new Error(`No interceptor found for protocol: ${protocol}`);
     }
     return interceptor;
-  }
-
-  public static registerInterceptor(
-    protocol: Protocol,
-    interceptor: RpcInterceptor
-  ): void {
-    this.interceptors.set(protocol, interceptor);
-  }
-
-  public static hasInterceptor(protocol: Protocol): boolean {
-    return this.interceptors.has(protocol);
   }
 }
 

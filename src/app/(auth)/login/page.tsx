@@ -27,20 +27,6 @@ export default function LoginPage() {
     setError(null);
 
     try {
-      // Call your gRPC API endpoint
-      //   const response = await fetch("/api/auth/login", {
-      //     method: "POST",
-      //     headers: {
-      //       "Content-Type": "application/json",
-      //     },
-      //     body: JSON.stringify({
-      //       username: data.username,
-      //       password: data.password,
-      //     }),
-      //   });
-
-      //   const result = await response.json();
-
       const response = await authServiceRequests.login(
         {
           username: data.username,

@@ -1,4 +1,4 @@
-import "@/transport/setup-interceptors"; // must come before other imports
+// import "@/transport/setup-interceptors"; // must come before other imports
 
 import Footer from "@/src/components/common/footer";
 import Header from "@/src/components/common/header";

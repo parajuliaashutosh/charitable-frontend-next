@@ -21,20 +21,17 @@ type GrpcInterceptParams<
 
 // In grpc-interceptor-wrapper.ts
 export class GrpcInterceptorWrapper {
-  static async intercept<
-    TClient,
-    TRequest extends object,
-    TResponse extends object
-  >({
+  async intercept<TClient, TRequest extends object, TResponse extends object>({
     client,
     method,
     args,
     retries = 3,
     options = {},
   }: GrpcInterceptParams<TClient, TRequest, TResponse>): Promise<TResponse> {
+
     const meta = {
-      ...(options.meta || {}),
-      "x-retry-config": { maxRetries: retries },
+      ...(options?.meta || {}),
+      "x-retry-config": JSON.stringify({ maxRetries: retries }),
     };
     const rpcOptions: RpcOptions = { ...options, meta };
 
@@ -57,13 +54,12 @@ export class GrpcInterceptorWrapper {
     throw lastError;
   }
 
-  private static shouldRetry(error: any): boolean {
+  private shouldRetry(error: any): boolean {
     const retryableCodes = ["UNAVAILABLE", "DEADLINE_EXCEEDED", "UNKNOWN"];
     return retryableCodes.includes(error?.code);
   }
 
-  private static delay(ms: number): Promise<void> {
+  private delay(ms: number): Promise<void> {
     return new Promise((resolve) => setTimeout(resolve, ms));
   }
 }
-export const grpcInterceptor = GrpcInterceptorWrapper;
