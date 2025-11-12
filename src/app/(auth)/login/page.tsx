@@ -1,8 +1,10 @@
 "use client";
 
 import authServiceRequests from "@/src/transport/gateway/gRPC/requests/auth/auth-requests";
+import { LoginResponse } from "@/src/transport/gateway/gRPC/stubs/exposed-auth";
 import { Eye, EyeOff, Heart } from "lucide-react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 
@@ -12,6 +14,8 @@ interface LoginFormData {
 }
 
 export default function LoginPage() {
+  const router = useRouter();
+  
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -33,16 +37,14 @@ export default function LoginPage() {
           password: data.password,
         },
         0
-      );
+      ) as LoginResponse;
 
-      console.log("Login response:", response);
 
       if (response?.success) {
         // Store tokens
-        // localStorage.setItem("accessToken", result.data.accessToken);
-        // localStorage.setItem("refreshToken", result.data.refreshToken);
-        // Redirect to dashboard or home
-        // window.location.href = "/dashboard";
+        localStorage.setItem("accessToken", response?.data?.accessToken ?? "");
+        localStorage.setItem("refreshToken", response?.data?.refreshToken ?? "");
+        router.push("/dashboard");
       } else {
         setError(response?.message || "Login failed. Please try again.");
       }
@@ -56,14 +58,14 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-[var(--primary)] via-[var(--primary-light)] to-[var(--primary-dark)] flex items-center justify-center px-4 py-12">
+    <div className="min-h-screen bg-linear-to-br from-primary via-primary-light to-primary-dark flex items-center justify-center px-4 py-12">
       <div className="w-full max-w-md">
         {/* Logo/Brand */}
         <div className="text-center mb-8">
           <div className="flex justify-center mb-4">
             <div className="bg-white p-3 rounded-full shadow-lg">
               <Heart
-                className="w-10 h-10 text-[var(--primary)]"
+                className="w-10 h-10 text-primary"
                 fill="var(--primary)"
               />
             </div>
@@ -96,7 +98,7 @@ export default function LoginPage() {
                 {...register("username", {
                   required: "Username is required",
                 })}
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[var(--primary)] focus:border-transparent transition-all outline-none"
+                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent transition-all outline-none"
                 placeholder="Enter your email or phone"
               />
               {errors.username && (
@@ -125,7 +127,7 @@ export default function LoginPage() {
                       message: "Password must be at least 6 characters",
                     },
                   })}
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[var(--primary)] focus:border-transparent transition-all outline-none pr-12"
+                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent transition-all outline-none pr-12"
                   placeholder="Enter your password"
                 />
                 <button
@@ -152,13 +154,13 @@ export default function LoginPage() {
               <label className="flex items-center">
                 <input
                   type="checkbox"
-                  className="w-4 h-4 text-[var(--primary)] border-gray-300 rounded focus:ring-[var(--primary)]"
+                  className="w-4 h-4 text-primary border-gray-300 rounded focus:ring-primary"
                 />
                 <span className="ml-2 text-sm text-gray-600">Remember me</span>
               </label>
               <Link
                 href="/forgot-password"
-                className="text-sm text-[var(--primary)] hover:text-[var(--primary-light)] font-medium"
+                className="text-sm text-primary hover:text-primary-light font-medium"
               >
                 Forgot password?
               </Link>
@@ -168,7 +170,7 @@ export default function LoginPage() {
             <button
               type="submit"
               disabled={isLoading}
-              className="w-full bg-[var(--primary)] text-white py-3 rounded-lg font-semibold hover:bg-[var(--primary-light)] transition-all disabled:opacity-50 disabled:cursor-not-allowed shadow-lg hover:shadow-xl transform hover:scale-[1.02]"
+              className="w-full bg-primary text-white py-3 rounded-lg font-semibold hover:bg-primary-light transition-all disabled:opacity-50 disabled:cursor-not-allowed shadow-lg hover:shadow-xl transform hover:scale-[1.02]"
             >
               {isLoading ? (
                 <span className="flex items-center justify-center gap-2">
@@ -203,7 +205,7 @@ export default function LoginPage() {
             </div>
             <div className="relative flex justify-center text-sm">
               <span className="px-4 bg-white text-gray-500">
-                Don't have an account?
+                Don&apos;t have an account?
               </span>
             </div>
           </div>
@@ -212,7 +214,7 @@ export default function LoginPage() {
           <div className="space-y-3">
             <Link
               href="/register/user"
-              className="block w-full text-center px-4 py-3 border-2 border-[var(--primary)] text-[var(--primary)] rounded-lg font-semibold hover:bg-[var(--secondary)] transition-all"
+              className="block w-full text-center px-4 py-3 border-2 border-primary text-primary rounded-lg font-semibold hover:bg-secondary transition-all"
             >
               Register as Donor
             </Link>
