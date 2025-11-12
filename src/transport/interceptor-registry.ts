@@ -1,4 +1,4 @@
-import { GrpcInterceptorWrapper } from "./gateway/gRPC/grpc-interceptor-wrapper";
+import { CustomGrpcInterceptor } from "./gateway/gRPC/grpc-interceptor";
 
 type Protocol = "grpc" | "rest";
 
@@ -9,8 +9,8 @@ export class InterceptorRegistry {
 
   private constructor() {
     this.interceptors = {
-      grpc: new GrpcInterceptorWrapper(),
-      rest: new GrpcInterceptorWrapper(),
+      grpc: new CustomGrpcInterceptor(),
+      rest: new CustomGrpcInterceptor(),
     };
   }
 

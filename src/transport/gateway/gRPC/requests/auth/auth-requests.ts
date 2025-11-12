@@ -1,9 +1,9 @@
 import { InterceptorRegistry } from "@/src/transport/interceptor-registry";
 import serviceClients from "../../client/client-registry";
-import { GrpcInterceptorWrapper } from "../../grpc-interceptor-wrapper";
+import { CustomGrpcInterceptor } from "../../grpc-interceptor";
 import { LoginRequest, LoginResponse } from "../../stubs/exposed-auth";
 
-const grpcInterceptor = InterceptorRegistry.getInstance().getInterceptor('grpc') as GrpcInterceptorWrapper;
+const grpcInterceptor = InterceptorRegistry.getInstance().getInterceptor('grpc') as CustomGrpcInterceptor;
 
 const login = (request: LoginRequest, retryTimes: number): Promise<LoginResponse> => {
 	return grpcInterceptor.intercept({
