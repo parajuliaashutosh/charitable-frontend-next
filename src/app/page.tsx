@@ -1,5 +1,3 @@
-// import "@/transport/setup-interceptors"; // must come before other imports
-
 import Footer from "@/src/components/common/footer";
 import Header from "@/src/components/common/header";
 import Contact from "@/src/components/landing/contact";
