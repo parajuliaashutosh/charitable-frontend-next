@@ -63,7 +63,7 @@ const Input = React.memo(
             }}
             className='items-center h-8 cursor-pointer'
           >
-            {show ? <LucideEye /> : <LucideEyeOff />}
+            {show ? <LucideEye size={16}/> : <LucideEyeOff size={16} />}
           </div>
         </div>
         <FormError error={error?.message} />
