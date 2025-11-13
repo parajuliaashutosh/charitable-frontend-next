@@ -1,137 +1,134 @@
-"use client"
+"use client";
 
-import type React from "react"
+import { organizationRegistrationSchema } from "@/schema/auth.schema";
+import { yupResolver } from "@hookform/resolvers/yup";
+import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { useState } from "react";
+import { useForm } from "react-hook-form";
+import { MapPicker } from "../common/map-picker/map-picker";
+import { Button } from "../ui/button";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "../ui/card";
+import { Input } from "../ui/input";
 
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Input } from "@/components/ui/input"
-import Link from "next/link"
-import { useRouter } from "next/navigation"
-import { useState } from "react"
-import { MapPicker } from "../common/map-picker/map-picker"
-import { Button } from "../ui/button"
+interface IOrganizationRegistrationData {
+  organizationName: string;
+  email: string;
+  password: string;
+  confirmPassword: string;
+  phoneNumber: string;
+  contactNumber?: string;
+  address: string;
+  govtId: string;
+  organizationHeadFirstName: string;
+  organizationHeadMiddleName?: string;
+  organizationHeadLastName: string;
+  organizationHeadPhoneNumber?: string;
+  latitude: number;
+  longitude: number;
+}
 
 export default function OrganizationRegisterForm() {
-  const router = useRouter()
-  const [loading, setLoading] = useState(false)
-  const [showMap, setShowMap] = useState(false)
-  const [formData, setFormData] = useState({
-    organizationName: "",
-    email: "",
-    password: "",
-    confirmPassword: "",
-    phoneNumber: "",
-    contactNumber: "",
-    address: "",
-    govtId: "",
-    organizationHeadFirstName: "",
-    organizationHeadMiddleName: "",
-    organizationHeadLastName: "",
-    organizationHeadPhoneNumber: "",
-    latitude: 0,
-    longitude: 0,
-  })
-  const [error, setError] = useState("")
+  const router = useRouter();
+  const [showMap, setShowMap] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = e.target
-    setFormData((prev) => ({
-      ...prev,
-      [name]: value,
-    }))
-  }
+  const {
+    register,
+    handleSubmit,
+    formState: { errors, isSubmitting },
+    watch,
+    setValue,
+  } = useForm({
+    resolver: yupResolver(organizationRegistrationSchema),
+    defaultValues: {
+      organizationName: "",
+      email: "",
+      password: "",
+      confirmPassword: "",
+      phoneNumber: "",
+      contactNumber: "",
+      address: "",
+      govtId: "",
+      organizationHeadFirstName: "",
+      organizationHeadMiddleName: "",
+      organizationHeadLastName: "",
+      organizationHeadPhoneNumber: "",
+      latitude: 0,
+      longitude: 0,
+    },
+  });
+
+  const latitude = watch("latitude");
+  const longitude = watch("longitude");
 
   const handleLocationSelect = (lat: number, lng: number) => {
-    setFormData((prev) => ({
-      ...prev,
-      latitude: lat,
-      longitude: lng,
-    }))
-    setShowMap(false)
-  }
+    setValue("latitude", lat);
+    setValue("longitude", lng);
+    setShowMap(false);
+  };
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
-    setError("")
-
-    // Validation
-    if (
-      !formData.organizationName ||
-      !formData.email ||
-      !formData.password ||
-      !formData.phoneNumber ||
-      !formData.address ||
-      !formData.govtId ||
-      !formData.organizationHeadFirstName ||
-      !formData.organizationHeadLastName
-    ) {
-      setError("Please fill in all required fields")
-      return
-    }
-
-    if (formData.password !== formData.confirmPassword) {
-      setError("Passwords do not match")
-      return
-    }
-
-    if (formData.latitude === 0 && formData.longitude === 0) {
-      setError("Please select an organization location on the map")
-      return
-    }
-
-    setLoading(true)
+  const onSubmit = async (data: IOrganizationRegistrationData) => {
+    setError(null);
     try {
       const response = await fetch("/api/auth/register-organization", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          email: formData.email,
-          password: formData.password,
-          phone_number: formData.phoneNumber,
-          organization_name: formData.organizationName,
-          organizationHeadFirstName: formData.organizationHeadFirstName,
-          organizationHeadMiddleName: formData.organizationHeadMiddleName,
-          organizationHeadLastName: formData.organizationHeadLastName,
-          organizationHeadPhoneNumber: formData.organizationHeadPhoneNumber,
-          address: formData.address,
-          latitude: formData.latitude,
-          longitude: formData.longitude,
-          govt_id: formData.govtId,
-          contact_number: formData.contactNumber,
+          email: data.email,
+          password: data.password,
+          phone_number: data.phoneNumber,
+          organization_name: data.organizationName,
+          organizationHeadFirstName: data.organizationHeadFirstName,
+          organizationHeadMiddleName: data.organizationHeadMiddleName,
+          organizationHeadLastName: data.organizationHeadLastName,
+          organizationHeadPhoneNumber: data.organizationHeadPhoneNumber,
+          address: data.address,
+          latitude: data.latitude,
+          longitude: data.longitude,
+          govt_id: data.govtId,
+          contact_number: data.contactNumber,
         }),
-      })
+      });
 
-      const data = await response.json()
+      const result = await response.json();
 
       if (!response.ok) {
-        setError(data.message || "Registration failed")
-        return
+        setError(result.message || "Registration failed");
+        return;
       }
 
-      // Success - redirect to login
-      router.push("/login?registered=true")
+      router.push("/login?registered=true");
     } catch (err) {
-      setError("An error occurred. Please try again.")
-      console.error(err)
-    } finally {
-      setLoading(false)
+      setError("An error occurred. Please try again.");
+      console.error(err);
     }
-  }
+  };
 
   return (
-    <div className="min-h-screen bg-background py-12 px-4">
+    <div className="bg-background py-4 px-4 max-h-[90vh] overflow-y-auto hide-scrollbar">
       <div className="max-w-4xl mx-auto">
         <Card>
           <CardHeader className="text-center">
             <CardTitle className="text-3xl">Register Organization</CardTitle>
             <CardDescription>
-              Register your organization to manage funding and contribute to the community
+              Register your organization to manage funding and contribute to the
+              community
             </CardDescription>
           </CardHeader>
           <CardContent>
-            <form onSubmit={handleSubmit} className="space-y-8">
+            <form onSubmit={handleSubmit(onSubmit)} className="space-y-8">
               {/* Organization Information */}
               <div className="space-y-4">
-                <h3 className="font-semibold text-lg">Organization Information</h3>
+                <h3 className="font-semibold text-lg">
+                  Organization Information
+                </h3>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div className="space-y-2">
@@ -139,8 +136,7 @@ export default function OrganizationRegisterForm() {
                       label="Organization Name"
                       id="organizationName"
                       name="organizationName"
-                      value={formData.organizationName}
-                      onChange={handleInputChange}
+                      {...register("organizationName")}
                       placeholder="Your Organization"
                       required
                     />
@@ -150,8 +146,7 @@ export default function OrganizationRegisterForm() {
                       label="Government ID"
                       id="govtId"
                       name="govtId"
-                      value={formData.govtId}
-                      onChange={handleInputChange}
+                      {...register("govtId")}
                       placeholder="Registration Number"
                       required
                     />
@@ -160,11 +155,10 @@ export default function OrganizationRegisterForm() {
 
                 <div className="space-y-2">
                   <Input
-
+                    label="Address"
                     id="address"
                     name="address"
-                    value={formData.address}
-                    onChange={handleInputChange}
+                    {...register("address")}
                     placeholder="Organization Address"
                     required
                   />
@@ -175,22 +169,20 @@ export default function OrganizationRegisterForm() {
                     <Input
                       label="Phone Number"
                       id="phoneNumber"
-                      required
                       name="phoneNumber"
                       type="tel"
-                      value={formData.phoneNumber}
-                      onChange={handleInputChange}
+                      {...register("phoneNumber")}
                       placeholder="+1 (555) 000-0000"
+                      required
                     />
                   </div>
                   <div className="space-y-2">
                     <Input
-                      label="Contact Number"  
+                      label="Contact Number"
                       id="contactNumber"
                       name="contactNumber"
                       type="tel"
-                      value={formData.contactNumber}
-                      onChange={handleInputChange}
+                      {...register("contactNumber")}
                       placeholder="+1 (555) 000-0000"
                     />
                   </div>
@@ -199,7 +191,9 @@ export default function OrganizationRegisterForm() {
 
               {/* Organization Head Information */}
               <div className="space-y-4">
-                <h3 className="font-semibold text-lg">Organization Head Information</h3>
+                <h3 className="font-semibold text-lg">
+                  Organization Head Information
+                </h3>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div className="space-y-2">
@@ -207,8 +201,7 @@ export default function OrganizationRegisterForm() {
                       label="First Name"
                       id="organizationHeadFirstName"
                       name="organizationHeadFirstName"
-                      value={formData.organizationHeadFirstName}
-                      onChange={handleInputChange}
+                      {...register("organizationHeadFirstName")}
                       placeholder="John"
                       required
                     />
@@ -218,8 +211,7 @@ export default function OrganizationRegisterForm() {
                       label="Middle Name"
                       id="organizationHeadMiddleName"
                       name="organizationHeadMiddleName"
-                      value={formData.organizationHeadMiddleName}
-                      onChange={handleInputChange}
+                      {...register("organizationHeadMiddleName")}
                       placeholder="Michael"
                     />
                   </div>
@@ -231,8 +223,7 @@ export default function OrganizationRegisterForm() {
                       label="Last Name"
                       id="organizationHeadLastName"
                       name="organizationHeadLastName"
-                      value={formData.organizationHeadLastName}
-                      onChange={handleInputChange}
+                      {...register("organizationHeadLastName")  }
                       placeholder="Doe"
                       required
                     />
@@ -243,8 +234,7 @@ export default function OrganizationRegisterForm() {
                       id="organizationHeadPhoneNumber"
                       name="organizationHeadPhoneNumber"
                       type="tel"
-                      value={formData.organizationHeadPhoneNumber}
-                      onChange={handleInputChange}
+                      {...register("organizationHeadPhoneNumber")}
                       placeholder="+1 (555) 000-0000"
                     />
                   </div>
@@ -261,8 +251,7 @@ export default function OrganizationRegisterForm() {
                     id="email"
                     name="email"
                     type="email"
-                    value={formData.email}
-                    onChange={handleInputChange}
+                    {...register("email")}
                     placeholder="org@example.com"
                     required
                   />
@@ -275,8 +264,7 @@ export default function OrganizationRegisterForm() {
                       id="password"
                       name="password"
                       type="password"
-                      value={formData.password}
-                      onChange={handleInputChange}
+                      {...register("password")    }
                       placeholder="••••••••"
                       required
                     />
@@ -287,8 +275,7 @@ export default function OrganizationRegisterForm() {
                       id="confirmPassword"
                       name="confirmPassword"
                       type="password"
-                      value={formData.confirmPassword}
-                      onChange={handleInputChange}
+                      {...register("confirmPassword")}
                       placeholder="••••••••"
                       required
                     />
@@ -302,24 +289,25 @@ export default function OrganizationRegisterForm() {
 
                 {!showMap ? (
                   <div className="border border-border rounded-lg p-4 bg-muted">
-                    {formData.latitude === 0 && formData.longitude === 0 ? (
+                    {latitude === 0 && longitude === 0 ? (
                       <p className="text-sm text-muted-foreground mb-3">No location selected yet</p>
                     ) : (
                       <p className="text-sm text-muted-foreground mb-3">
-                        Selected: Lat {formData.latitude.toFixed(4)}, Lng {formData.longitude.toFixed(4)}
+                        Selected: Lat {latitude.toFixed(4)}, Lng {longitude.toFixed(4)}
                       </p>
                     )}
                     <Button type="button" variant="outline" onClick={() => setShowMap(true)} className="w-full">
-                      {formData.latitude === 0 ? "Select Location on Map" : "Change Location"}
+                      {latitude === 0 ? "Select Location on Map" : "Change Location"}
                     </Button>
                   </div>
                 ) : (
                   <MapPicker
                     onLocationSelect={handleLocationSelect}
-                    initialLat={formData.latitude || 20.5937}
-                    initialLng={formData.longitude || 78.9629}
+                    initialLat={latitude || 20.5937}
+                    initialLng={longitude || 78.9629}
                   />
                 )}
+                {errors.latitude && <p className="text-sm text-destructive">{errors.latitude.message}</p>}
               </div>
 
               {/* Error Message */}
@@ -330,14 +318,24 @@ export default function OrganizationRegisterForm() {
               )}
 
               {/* Submit Button */}
-              <Button type="submit" className="w-full" size="lg" disabled={loading}>
-                {loading ? "Creating Organization Account..." : "Register Organization"}
+              <Button
+                type="submit"
+                className="w-full"
+                size="lg"
+                disabled={isSubmitting}
+              >
+                {isSubmitting
+                  ? "Creating Organization Account..."
+                  : "Register Organization"}
               </Button>
 
               {/* Login Link */}
               <p className="text-center text-sm text-muted-foreground">
                 Already have an account?{" "}
-                <Link href="/login" className="text-primary hover:underline font-semibold">
+                <Link
+                  href="/login"
+                  className="text-primary hover:underline font-semibold"
+                >
                   Sign In
                 </Link>
               </p>
@@ -346,5 +344,5 @@ export default function OrganizationRegisterForm() {
         </Card>
       </div>
     </div>
-  )
+  );
 }

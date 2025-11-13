@@ -1,259 +1,283 @@
-// src/app/(auth)/register/user/user-register-form.tsx
 "use client";
 
-import { Eye, EyeOff, Mail, Phone, User } from "lucide-react";
+import { userRegistrationSchema } from "@/schema/auth.schema";
+import authServiceRequests from "@/transport/gateway/gRPC/requests/auth/auth-requests";
+import { RegisterUserRequest } from "@/transport/gateway/gRPC/stubs/exposed-auth";
+import { yupResolver } from "@hookform/resolvers/yup";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
+import { toast } from "sonner";
+import { MapPicker } from "../common/map-picker/map-picker";
+import { Button } from "../ui/button";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "../ui/card";
+import { Input } from "../ui/input";
 
-interface UserRegisterFormData {
-  fullName: string;
+interface IUserRegistrationData {
+  firstName: string;
+  middleName?: string;
+  lastName: string;
   email: string;
-  phone: string;
+  phoneNumber: string;
   password: string;
   confirmPassword: string;
-  agreeToTerms: boolean;
+  latitude: number;
+  longitude: number;
 }
 
 export default function UserRegisterForm() {
   const router = useRouter();
-  
-  const [showPassword, setShowPassword] = useState(false);
-  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
-  const [isLoading, setIsLoading] = useState(false);
+  const [showMap, setShowMap] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   const {
     register,
     handleSubmit,
+    formState: { errors, isSubmitting },
     watch,
-    formState: { errors },
-  } = useForm<UserRegisterFormData>();
+    setValue,
+  } = useForm({
+    resolver: yupResolver(userRegistrationSchema),
+    defaultValues: {
+      firstName: "",
+      middleName: "",
+      lastName: "",
+      email: "",
+      phoneNumber: "",
+      password: "",
+      confirmPassword: "",
+      latitude: 0,
+      longitude: 0,
+    },
+  });
 
-  const password = watch("password");
+  const latitude = watch("latitude");
+  const longitude = watch("longitude");
 
-  const onSubmit = async (data: UserRegisterFormData) => {
-    setIsLoading(true);
+  const handleLocationSelect = (lat: number, lng: number) => {
+    setValue("latitude", lat);
+    setValue("longitude", lng);
+    setShowMap(false);
+  };
+
+  const onSubmit = async (data: IUserRegistrationData) => {
     setError(null);
-
     try {
-      console.log("Registration data:", data);
-      await new Promise(resolve => setTimeout(resolve, 2000));
+      const payload: RegisterUserRequest = {
+        firstName: data.firstName,
+        middleName: data.middleName || "",
+        lastName: data.lastName,
+        email: data.email,
+        phoneNumber: data.phoneNumber,
+        password: data.password,
+        latitude: data.latitude,
+        longitude: data.longitude,
+      };
+      const response = await authServiceRequests.registerUser(payload, 2);
+
+      if (!response.success) {
+        setError(response.message || "Registration failed");
+        toast.error("Action Failed", {
+          description: response?.message || "Registration failed",
+        });
+        return;
+      }
+
+      toast.success("Action Successful", {
+        description: response?.message || "Registration completed successfully",
+      });
       router.push("/login?registered=true");
     } catch (err) {
-      console.error("Registration error:", err);
-      setError("An error occurred during registration. Please try again.");
-    } finally {
-      setIsLoading(false);
+      setError("An error occurred. Please try again.");
+      toast.error("Action Failed", {
+        description: err?.message || "Registration failed",
+      });
+      console.error(err);
     }
   };
 
   return (
-    <div className="w-full">
-      {/* Header */}
-      <div className="mb-8">
-        <h1 className="text-3xl font-bold text-foreground mb-2">Join as Donor</h1>
-        <p className="text-muted-foreground">Start making a difference today</p>
-      </div>
+    <div className="bg-background py-4 px-4 max-h-[90vh] overflow-y-auto hide-scrollbar">
+      <div className="max-w-2xl mx-auto">
+        <Card>
+          <CardHeader className="text-center">
+            <CardTitle className="text-3xl">Register as Donor</CardTitle>
+            <CardDescription>
+              Create your account to start contributing to meaningful causes
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
+              {/* Error Message */}
+              {error && (
+                <div className="bg-destructive/10 border border-destructive text-destructive px-4 py-3 rounded-lg text-sm">
+                  {error}
+                </div>
+              )}
 
-      {/* Register Form */}
-      <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
-        {/* Error Message */}
-        {error && (
-          <div className="bg-destructive/10 border border-destructive/30 text-destructive px-4 py-3 rounded-lg text-sm">
-            {error}
-          </div>
-        )}
+              {/* Personal Information */}
+              <div className="space-y-4">
+                <h3 className="font-semibold text-lg">Personal Information</h3>
 
-        {/* Full Name Field */}
-        <div>
-          <label htmlFor="fullName" className="block text-sm font-medium text-foreground mb-2">
-            Full Name
-          </label>
-          <div className="relative">
-            <User className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground w-5 h-5" />
-            <input
-              id="fullName"
-              type="text"
-              {...register("fullName", {
-                required: "Full name is required",
-                minLength: { value: 2, message: "Name must be at least 2 characters" },
-              })}
-              className="w-full pl-10 pr-4 py-3 bg-input border border-border rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent transition-all outline-none text-foreground placeholder:text-muted-foreground"
-              placeholder="Enter your full name"
-            />
-          </div>
-          {errors.fullName && (
-            <p className="mt-1 text-sm text-destructive">{errors.fullName.message}</p>
-          )}
-        </div>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <Input
+                    label="First Name"
+                    id="firstName"
+                    required
+                    placeholder="John"
+                    {...register("firstName")}
+                    error={errors.firstName}
+                    className="w-full"
+                  />
+                  <Input
+                    label="Middle Name"
+                    id="middleName"
+                    placeholder="Michael"
+                    {...register("middleName")}
+                    className="w-full"
+                  />
+                </div>
 
-        {/* Email Field */}
-        <div>
-          <label htmlFor="email" className="block text-sm font-medium text-foreground mb-2">
-            Email Address
-          </label>
-          <div className="relative">
-            <Mail className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground w-5 h-5" />
-            <input
-              id="email"
-              type="email"
-              {...register("email", {
-                required: "Email is required",
-                pattern: {
-                  value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i,
-                  message: "Invalid email address",
-                },
-              })}
-              className="w-full pl-10 pr-4 py-3 bg-input border border-border rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent transition-all outline-none text-foreground placeholder:text-muted-foreground"
-              placeholder="Enter your email"
-            />
-          </div>
-          {errors.email && (
-            <p className="mt-1 text-sm text-destructive">{errors.email.message}</p>
-          )}
-        </div>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <Input
+                    label="Last Name"
+                    id="lastName"
+                    required
+                    placeholder="Doe"
+                    {...register("lastName")}
+                    error={errors.lastName}
+                    className="w-full"
+                  />
 
-        {/* Phone Field */}
-        <div>
-          <label htmlFor="phone" className="block text-sm font-medium text-foreground mb-2">
-            Phone Number
-          </label>
-          <div className="relative">
-            <Phone className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground w-5 h-5" />
-            <input
-              id="phone"
-              type="tel"
-              {...register("phone", {
-                required: "Phone number is required",
-                pattern: {
-                  value: /^[0-9]{10,}$/,
-                  message: "Invalid phone number",
-                },
-              })}
-              className="w-full pl-10 pr-4 py-3 bg-input border border-border rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent transition-all outline-none text-foreground placeholder:text-muted-foreground"
-              placeholder="Enter your phone number"
-            />
-          </div>
-          {errors.phone && (
-            <p className="mt-1 text-sm text-destructive">{errors.phone.message}</p>
-          )}
-        </div>
+                  <Input
+                    label="Phone Number"
+                    id="phoneNumber"
+                    type="tel"
+                    required
+                    placeholder="+1 (555) 000-0000"
+                    {...register("phoneNumber")}
+                    error={errors.phoneNumber}
+                    className="w-full"
+                  />
+                </div>
+              </div>
 
-        {/* Password Field */}
-        <div>
-          <label htmlFor="password" className="block text-sm font-medium text-foreground mb-2">
-            Password
-          </label>
-          <div className="relative">
-            <input
-              id="password"
-              type={showPassword ? "text" : "password"}
-              {...register("password", {
-                required: "Password is required",
-                minLength: { value: 8, message: "Password must be at least 8 characters" },
-              })}
-              className="w-full px-4 py-3 bg-input border border-border rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent transition-all outline-none pr-12 text-foreground placeholder:text-muted-foreground"
-              placeholder="Create a password"
-            />
-            <button
-              type="button"
-              onClick={() => setShowPassword(!showPassword)}
-              className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
-            >
-              {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
-            </button>
-          </div>
-          {errors.password && (
-            <p className="mt-1 text-sm text-destructive">{errors.password.message}</p>
-          )}
-        </div>
+              {/* Account Information */}
+              <div className="space-y-4">
+                <h3 className="font-semibold text-lg">Account Information</h3>
 
-        {/* Confirm Password Field */}
-        <div>
-          <label htmlFor="confirmPassword" className="block text-sm font-medium text-foreground mb-2">
-            Confirm Password
-          </label>
-          <div className="relative">
-            <input
-              id="confirmPassword"
-              type={showConfirmPassword ? "text" : "password"}
-              {...register("confirmPassword", {
-                required: "Please confirm your password",
-                validate: (value) => value === password || "Passwords do not match",
-              })}
-              className="w-full px-4 py-3 bg-input border border-border rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent transition-all outline-none pr-12 text-foreground placeholder:text-muted-foreground"
-              placeholder="Confirm your password"
-            />
-            <button
-              type="button"
-              onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-              className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
-            >
-              {showConfirmPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
-            </button>
-          </div>
-          {errors.confirmPassword && (
-            <p className="mt-1 text-sm text-destructive">{errors.confirmPassword.message}</p>
-          )}
-        </div>
+                <div className="space-y-2">
+                  <Input
+                    label="Email Address"
+                    id="email"
+                    type="email"
+                    required
+                    placeholder="john@example.com"
+                    {...register("email")}
+                    error={errors.email}
+                    className="w-full"
+                  />
+                </div>
 
-        {/* Terms Agreement */}
-        <div>
-          <label className="flex items-start">
-            <input
-              type="checkbox"
-              {...register("agreeToTerms", { required: "You must agree to the terms" })}
-              className="w-4 h-4 text-primary border-border rounded focus:ring-primary mt-1"
-            />
-            <span className="ml-2 text-sm text-muted-foreground">
-              I agree to the{" "}
-              <Link href="/terms" className="text-primary hover:underline">Terms of Service</Link>
-              {" "}and{" "}
-              <Link href="/privacy" className="text-primary hover:underline">Privacy Policy</Link>
-            </span>
-          </label>
-          {errors.agreeToTerms && (
-            <p className="mt-1 text-sm text-destructive">{errors.agreeToTerms.message}</p>
-          )}
-        </div>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <Input
+                      label="Password"
+                      id="password"
+                      type="password"
+                      required
+                      placeholder="••••••••"
+                      {...register("password")}
+                      error={errors.password}
+                      className="w-full"
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Input
+                      label="Confirm Password"
+                      id="confirmPassword"
+                      type="password"
+                      required
+                      placeholder="••••••••"
+                      {...register("confirmPassword")}
+                      error={errors.confirmPassword}
+                      className="w-full"
+                    />
+                  </div>
+                </div>
+              </div>
 
-        {/* Submit Button */}
-        <button
-          type="submit"
-          disabled={isLoading}
-          className="w-full bg-warning text-white py-3.5 rounded-lg font-semibold hover:bg-warning/90 transition-all disabled:opacity-50 disabled:cursor-not-allowed shadow-lg hover:shadow-xl transform hover:scale-[1.02] uppercase tracking-wide"
-        >
-          {isLoading ? (
-            <span className="flex items-center justify-center gap-2">
-              <svg className="animate-spin h-5 w-5" viewBox="0 0 24 24">
-                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" />
-                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
-              </svg>
-              Creating Account...
-            </span>
-          ) : (
-            "CREATE ACCOUNT"
-          )}
-        </button>
-      </form>
+              {/* Location Selection */}
+              <div className="space-y-4">
+                <h3 className="font-semibold text-lg">Location</h3>
 
-      {/* Login Link */}
-      <div className="mt-6 text-center">
-        <p className="text-sm text-muted-foreground">
-          Already have an account?{" "}
-          <Link href="/login" className="text-warning hover:text-warning/90 font-semibold">
-            Sign In
-          </Link>
-        </p>
-      </div>
+                {!showMap ? (
+                  <div className="border border-border rounded-lg p-4 bg-muted">
+                    {latitude === 0 && longitude === 0 ? (
+                      <p className="text-sm text-muted-foreground mb-3">
+                        No location selected yet
+                      </p>
+                    ) : (
+                      <p className="text-sm text-muted-foreground mb-3">
+                        Selected: Lat {latitude.toFixed(4)}, Lng{" "}
+                        {longitude.toFixed(4)}
+                      </p>
+                    )}
+                    <Button
+                      type="button"
+                      variant="outline"
+                      onClick={() => setShowMap(true)}
+                      className="w-full"
+                    >
+                      {latitude === 0
+                        ? "Select Location on Map"
+                        : "Change Location"}
+                    </Button>
+                  </div>
+                ) : (
+                  <MapPicker
+                    onLocationSelect={handleLocationSelect}
+                    initialLat={latitude || 20.5937}
+                    initialLng={longitude || 78.9629}
+                  />
+                )}
+                {errors.latitude && (
+                  <p className="text-sm text-destructive">
+                    {errors.latitude.message}
+                  </p>
+                )}
+              </div>
 
-      {/* Back to Home - Mobile Only */}
-      <div className="mt-6 text-center lg:hidden">
-        <Link href="/" className="text-sm text-muted-foreground hover:text-primary font-medium">
-          ← Back to Home
-        </Link>
+              {/* Submit Button */}
+              <Button
+                type="submit"
+                className="w-full"
+                size="lg"
+                disabled={isSubmitting}
+              >
+                {isSubmitting ? "Creating Account..." : "Register"}
+              </Button>
+
+              {/* Login Link */}
+              <p className="text-center text-sm text-muted-foreground">
+                Already have an account?{" "}
+                <Link
+                  href="/login"
+                  className="text-primary hover:underline font-semibold"
+                >
+                  Sign In
+                </Link>
+              </p>
+            </form>
+          </CardContent>
+        </Card>
       </div>
     </div>
   );

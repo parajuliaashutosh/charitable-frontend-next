@@ -87,7 +87,7 @@ export default function AuthLayout({
         </div>
 
         {/* Right Side - Form */}
-        <div className="flex flex-col justify-center items-center px-4 sm:px-8 py-12">{children}</div>
+        <div className="flex flex-col justify-center items-center px-4 sm:px-8">{children}</div>
       </div>
     </div>
   )
