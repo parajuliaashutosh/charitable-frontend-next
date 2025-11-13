@@ -1,5 +1,5 @@
 // src/app/(auth)/register/user/page.tsx
-import UserRegisterForm from "@/src/components/auth-form/UserRegisterForm";
+import UserRegisterForm from "@/components/auth-form/user-register-form";
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {

@@ -1,4 +1,4 @@
-import LoginForm from "@/src/components/auth-form/LoginForm";
+import LoginForm from "@/components/auth-form/login-form";
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
@@ -17,7 +17,7 @@ export default function LoginPage() {
       <div className="mb-8">
         <div className="flex items-center justify-center mb-6">
           <div className="w-12 h-12 rounded-full bg-primary flex items-center justify-center text-white font-bold text-lg">
-            SK
+            Give Hope
           </div>
         </div>
         <h2 className="text-2xl font-bold text-foreground text-center mb-2">Sign In</h2>
