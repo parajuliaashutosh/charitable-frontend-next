@@ -1,14 +1,13 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
-import authServiceRequests from "@/transport/gateway/gRPC/requests/auth/auth-requests";
+import { loginSchema } from "@/schema/auth.schema";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { signIn } from "next-auth/react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
-import * as yup from "yup";
 import { FormLabel } from "../ui/form";
 import { Input } from "../ui/input";
 
@@ -16,15 +15,6 @@ interface ILoginFormData {
   username: string;
   password: string;
 }
-
-// Simple validation schema
-const loginSchema = yup.object().shape({
-  username: yup.string().required("Email or phone is required"),
-  password: yup
-    .string()
-    .required("Password is required")
-    .min(6, "Password must be at least 6 characters"),
-});
 
 export default function LoginForm() {
   const router = useRouter();
@@ -45,7 +35,6 @@ export default function LoginForm() {
   const onSubmit = async (data: ILoginFormData) => {
     setError(null);
     try {
-      // Replace this with your actual API call
       const response = await signIn("credentials", {
         username: data.username,
         password: data.password,
@@ -54,17 +43,8 @@ export default function LoginForm() {
       });
 
       console.log("🚀 ~ onSubmit ~ response:", response);
-      // localStorageService.setItem(
-      //   LocalStorageKeys.ACCESS_TOKEN,
-      //   response?.data?.accessToken || ""
-      // );
-      // localStorageService.setItem(
-      //   LocalStorageKeys.REFRESH_TOKEN,
-      //   response?.data?.refreshToken || ""
-      // );
-
-      const resp = await authServiceRequests.myInfo({}, 3);
-      console.log("🚀 ~ onSubmit ~ resp:", resp);
+      // const resp = await authServiceRequests.myInfo({}, 3);
+      // console.log("🚀 ~ onSubmit ~ resp:", resp);
       // For now, just redirect to dashboard
       router.push("/dashboard");
     } catch (err) {

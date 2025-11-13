@@ -1,5 +1,4 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { LocalStorageKeys, localStorageService } from "@/store/local-storage/loca-storage-service";
 import { RpcOptions, UnaryCall } from "@protobuf-ts/runtime-rpc";
 
 type GrpcInterceptParams<
@@ -29,13 +28,13 @@ export class CustomGrpcInterceptor {
     options = {},
   }: GrpcInterceptParams<TClient, TRequest, TResponse>): Promise<TResponse> {
 
-    const token = localStorageService.getItem(LocalStorageKeys.ACCESS_TOKEN);
-    const authMeta = token ? { Authorization: `Bearer ${token}` } : {};
+    // const token = localStorageService.getItem(LocalStorageKeys.ACCESS_TOKEN);
+    // const authMeta = token ? { Authorization: `Bearer ${token}` } : {};
 
     const meta = {
       ...(options?.meta || {}),
       "x-retry-config": JSON.stringify({ maxRetries: retries }),
-      ...authMeta,
+      // ...authMeta,
     };
     const rpcOptions: RpcOptions = { ...options, meta };
 

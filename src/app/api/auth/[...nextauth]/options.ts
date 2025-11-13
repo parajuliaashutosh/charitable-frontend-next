@@ -1,5 +1,6 @@
 import authServiceRequests from "@/transport/gateway/gRPC/requests/auth/auth-requests";
-import { NextAuthOptions } from "next-auth";
+import { Role } from "@/transport/gateway/gRPC/stubs/exposed-common";
+import { NextAuthOptions, User } from "next-auth";
 import Credentials from "next-auth/providers/credentials";
 
 export const options: NextAuthOptions = {
@@ -10,7 +11,9 @@ export const options: NextAuthOptions = {
         username: { label: "Username", type: "text", placeholder: "john" },
         password: { label: "Password", type: "password" },
       },
-      async authorize(credentials) {
+      async authorize(
+        credentials: Record<"username" | "password", string>,
+      ) {
         try {
           const res = await authServiceRequests.login(
             {
@@ -19,12 +22,23 @@ export const options: NextAuthOptions = {
             },
             3
           );
+          console.log("Authorize response:", res);
 
-          const userResp = await authServiceRequests.myInfo({}, 3);
-          const user = userResp?.data || null;
-
-          if (res.success && user) {
-            return user;
+          const resp = await authServiceRequests.myInfo({}, 3, {
+            meta: {
+              Authorization: `Bearer ${res?.data?.accessToken}`,
+            },
+          });
+          const userData = resp?.data;
+          if (res.success) {
+            return {
+              id: userData?.email,
+              email: userData?.email,
+              role: userData?.role as Role,
+              phoneNumber: userData?.phone || "",
+              accessToken: res.data?.accessToken || "",
+              refreshToken: res.data?.refreshToken || "",
+            } as User;
           } else {
             return null;
           }
@@ -36,20 +50,31 @@ export const options: NextAuthOptions = {
     }),
   ],
   callbacks: {
-    async session({ session, token }) {
-      // Customize session object here
-      return session;
-    },
     async jwt({ token, user }) {
-      // Customize JWT token here
+      console.log("🚀 ~ jwt token:", token);
+      console.log("🚀 ~ jwt user:", user);
+      if (user) {
+        token.accessToken = user.accessToken;
+        token.refreshToken = user.refreshToken;
+      }
       return token;
     },
+    async session({ session, token }) {
+      console.log("🚀 ~ token:", token);
+      console.log("🚀 ~ session:", session);
+      session.accessToken = token.accessToken;
+      session.refreshToken = token.refreshToken;
+      return session;
+    },
   },
+
+  secret: process.env.NEXTAUTH_SECRET,
+
   pages: {
     signIn: "/auth/signin",
     signOut: "/auth/signout",
-    error: "/auth/error", // Error code passed in query string as ?error=
+    error: "/login", // Error code passed in query string as ?error=
     verifyRequest: "/auth/verify-request", // (used for check email message)
-    newUser: "/auth/welcome", // New users will be directed here on first sign in
+    newUser: "/auth/welcome",
   },
 };
