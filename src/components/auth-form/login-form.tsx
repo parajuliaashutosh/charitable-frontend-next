@@ -1,31 +1,34 @@
-"use client"
+"use client";
 
-import { Button } from "@/components/ui/button"
-import { LocalStorageKeys, localStorageService } from "@/store/local-storage/loca-storage-service"
-import authServiceRequests from "@/transport/gateway/gRPC/requests/auth/auth-requests"
-import { yupResolver } from "@hookform/resolvers/yup"
-import Link from "next/link"
-import { useRouter } from "next/navigation"
-import { useState } from "react"
-import { useForm } from "react-hook-form"
-import * as yup from "yup"
-import { FormLabel } from "../ui/form"
-import { Input } from "../ui/input"
+import { Button } from "@/components/ui/button";
+import authServiceRequests from "@/transport/gateway/gRPC/requests/auth/auth-requests";
+import { yupResolver } from "@hookform/resolvers/yup";
+import { signIn } from "next-auth/react";
+import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { useState } from "react";
+import { useForm } from "react-hook-form";
+import * as yup from "yup";
+import { FormLabel } from "../ui/form";
+import { Input } from "../ui/input";
 
 interface ILoginFormData {
-  username: string
-  password: string
+  username: string;
+  password: string;
 }
 
 // Simple validation schema
 const loginSchema = yup.object().shape({
   username: yup.string().required("Email or phone is required"),
-  password: yup.string().required("Password is required").min(6, "Password must be at least 6 characters"),
-})
+  password: yup
+    .string()
+    .required("Password is required")
+    .min(6, "Password must be at least 6 characters"),
+});
 
 export default function LoginForm() {
-  const router = useRouter()
-  const [error, setError] = useState<string | null>(null)
+  const router = useRouter();
+  const [error, setError] = useState<string | null>(null);
 
   const {
     register,
@@ -37,29 +40,38 @@ export default function LoginForm() {
       username: "",
       password: "",
     },
-  })
+  });
 
   const onSubmit = async (data: ILoginFormData) => {
-    setError(null)
+    setError(null);
     try {
       // Replace this with your actual API call
-      const response =  await authServiceRequests.login({
+      const response = await signIn("credentials", {
         username: data.username,
         password: data.password,
-      }, 3);
+        redirect: false,
+        callbackUrl: "/",
+      });
 
-      localStorageService.setItem(LocalStorageKeys.ACCESS_TOKEN, response?.data?.accessToken || "")
-      localStorageService.setItem(LocalStorageKeys.REFRESH_TOKEN, response?.data?.refreshToken || "")
+      console.log("🚀 ~ onSubmit ~ response:", response);
+      // localStorageService.setItem(
+      //   LocalStorageKeys.ACCESS_TOKEN,
+      //   response?.data?.accessToken || ""
+      // );
+      // localStorageService.setItem(
+      //   LocalStorageKeys.REFRESH_TOKEN,
+      //   response?.data?.refreshToken || ""
+      // );
 
-      const resp = await authServiceRequests.myInfo({} , 3);
-      console.log("🚀 ~ onSubmit ~ resp:", resp)
+      const resp = await authServiceRequests.myInfo({}, 3);
+      console.log("🚀 ~ onSubmit ~ resp:", resp);
       // For now, just redirect to dashboard
-      router.push("/dashboard")
+      router.push("/dashboard");
     } catch (err) {
-      setError("An error occurred. Please try again.")
-      console.error("Login error:", err)
+      setError("An error occurred. Please try again.");
+      console.error("Login error:", err);
     }
-  }
+  };
 
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="space-y-6 w-full">
@@ -72,21 +84,24 @@ export default function LoginForm() {
 
       {/* Email/Username Field */}
 
-        <Input
-          label="Username"
-          id="username"
-          type="text"
-          placeholder="Enter your email or phone"
-          {...register("username")}
-          error={errors?.username}
-          className="w-full"
-        />
+      <Input
+        label="Username"
+        id="username"
+        type="text"
+        placeholder="Enter your email or phone"
+        {...register("username")}
+        error={errors?.username}
+        className="w-full"
+      />
 
       {/* Password Field */}
       <div className="space-y-2">
         <div className="flex items-center justify-between">
-          <FormLabel required >Password</FormLabel>
-          <Link href="/forgot-password" className="text-sm text-primary hover:underline">
+          <FormLabel required>Password</FormLabel>
+          <Link
+            href="/forgot-password"
+            className="text-sm text-primary hover:underline"
+          >
             Forgot password?
           </Link>
         </div>
@@ -107,7 +122,11 @@ export default function LoginForm() {
       </label>
 
       {/* Submit Button */}
-      <Button type="submit" disabled={isSubmitting} className="w-full py-3 text-base font-semibold">
+      <Button
+        type="submit"
+        disabled={isSubmitting}
+        className="w-full py-3 text-base font-semibold"
+      >
         {isSubmitting ? "Signing in..." : "Sign In"}
       </Button>
 
@@ -117,7 +136,9 @@ export default function LoginForm() {
           <div className="w-full border-t border-border"></div>
         </div>
         <div className="relative flex justify-center text-sm">
-          <span className="px-2 bg-background text-muted-foreground">Don&apos;t have an account?</span>
+          <span className="px-2 bg-background text-muted-foreground">
+            Don&apos;t have an account?
+          </span>
         </div>
       </div>
 
@@ -137,5 +158,5 @@ export default function LoginForm() {
         </Link>
       </div>
     </form>
-  )
+  );
 }
