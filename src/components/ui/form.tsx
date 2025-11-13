@@ -1,10 +1,12 @@
+import { ReactNode } from "react"
+
 export const FormLabel = ({
   className,
   children,
   required,
 }: {
   className?: string
-  children?: any
+  children?: ReactNode
   required?: boolean
 }) => {
   return (

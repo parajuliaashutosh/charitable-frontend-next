@@ -1,12 +1,14 @@
 "use client"
 
 import { Button } from "@/components/ui/button"
+import authServiceRequests from "@/transport/gateway/gRPC/requests/auth/auth-requests"
 import { yupResolver } from "@hookform/resolvers/yup"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
 import { useState } from "react"
 import { useForm } from "react-hook-form"
 import * as yup from "yup"
+import { FormLabel } from "../ui/form"
 import { Input } from "../ui/input"
 
 interface ILoginFormData {
@@ -40,11 +42,16 @@ export default function LoginForm() {
     setError(null)
     try {
       // Replace this with your actual API call
-      console.log("Login attempt:", data)
+      const response =  await authServiceRequests.login({
+        username: data.username,
+        password: data.password,
+      }, 3);
 
-      // Simulated delay
-      await new Promise((resolve) => setTimeout(resolve, 1000))
+      localStorage.setItem("accessToken", response?.data?.accessToken || "")
+      localStorage.setItem("refreshToken", response?.data?.refreshToken || "")
 
+      const resp = await authServiceRequests.myInfo({} , 3);
+      console.log("🚀 ~ onSubmit ~ resp:", resp)
       // For now, just redirect to dashboard
       router.push("/dashboard")
     } catch (err) {
@@ -63,26 +70,21 @@ export default function LoginForm() {
       )}
 
       {/* Email/Username Field */}
-      <div className="space-y-2">
-        <label htmlFor="username" className="block text-sm font-medium text-foreground">
-          Email or Phone
-        </label>
+
         <Input
+          label="Username"
           id="username"
           type="text"
           placeholder="Enter your email or phone"
           {...register("username")}
+          error={errors?.username}
           className="w-full"
         />
-        {errors.username && <p className="text-sm text-destructive">{errors.username.message}</p>}
-      </div>
 
       {/* Password Field */}
       <div className="space-y-2">
         <div className="flex items-center justify-between">
-          <label htmlFor="password" className="block text-sm font-medium text-foreground">
-            Password
-          </label>
+          <FormLabel required >Password</FormLabel>
           <Link href="/forgot-password" className="text-sm text-primary hover:underline">
             Forgot password?
           </Link>
@@ -93,8 +95,8 @@ export default function LoginForm() {
           placeholder="Enter your password"
           {...register("password")}
           className="w-full"
+          error={errors?.password}
         />
-        {errors.password && <p className="text-sm text-destructive">{errors.password.message}</p>}
       </div>
 
       {/* Remember Me */}

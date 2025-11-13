@@ -2,7 +2,7 @@ import { InterceptorRegistry } from "@/transport/interceptor-registry";
 import serviceClients from "../../client/client-registry";
 import { CustomGrpcInterceptor } from "../../grpc-interceptor";
 import { LoginRequest, LoginResponse, RegisterOrganizationRequest, RegisterUserRequest } from "../../stubs/exposed-auth";
-import { CommonResponse } from "../../stubs/exposed-common";
+import { CommonResponse, EmptyRequest } from "../../stubs/exposed-common";
 
 const grpcInterceptor = InterceptorRegistry.getInstance().getInterceptor('grpc') as CustomGrpcInterceptor;
 
@@ -33,10 +33,20 @@ const registerOrganization = (request: RegisterOrganizationRequest, retryTimes: 
 	});
 };
 
+const myInfo = (request: EmptyRequest, retryTimes: number): Promise<LoginResponse> => {
+	return grpcInterceptor.intercept({
+		client: serviceClients.authServiceClient,
+		method: (client) => client.myInfo.bind(client),
+		args: request,
+		retries: retryTimes,
+	});
+}
+
 const authServiceRequests = {
   login,
   registerUser,
   registerOrganization,
+  myInfo
 };
 
 export default authServiceRequests;
