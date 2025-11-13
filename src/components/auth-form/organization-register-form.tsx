@@ -1,11 +1,14 @@
 "use client";
 
 import { organizationRegistrationSchema } from "@/schema/auth.schema";
+import authServiceRequests from "@/transport/gateway/gRPC/requests/auth/auth-requests";
+import { RegisterOrganizationRequest } from "@/transport/gateway/gRPC/stubs/exposed-auth";
 import { yupResolver } from "@hookform/resolvers/yup";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
+import { toast } from "sonner";
 import { MapPicker } from "../common/map-picker/map-picker";
 import { Button } from "../ui/button";
 import {
@@ -76,37 +79,41 @@ export default function OrganizationRegisterForm() {
 
   const onSubmit = async (data: IOrganizationRegistrationData) => {
     setError(null);
-    try {
-      const response = await fetch("/api/auth/register-organization", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          email: data.email,
-          password: data.password,
-          phone_number: data.phoneNumber,
-          organization_name: data.organizationName,
-          organizationHeadFirstName: data.organizationHeadFirstName,
-          organizationHeadMiddleName: data.organizationHeadMiddleName,
-          organizationHeadLastName: data.organizationHeadLastName,
-          organizationHeadPhoneNumber: data.organizationHeadPhoneNumber,
-          address: data.address,
-          latitude: data.latitude,
-          longitude: data.longitude,
-          govt_id: data.govtId,
-          contact_number: data.contactNumber,
-        }),
-      });
+   try {
+      const payload: RegisterOrganizationRequest = {
+        organizationName: data.organizationName,
+        email: data.email,
+        password: data.password,
+        phoneNumber: data.phoneNumber,
+        contactNumber: data.contactNumber || "",
+        address: data.address,
+        govtId: data.govtId,
+        organizationHeadFirstName: data.organizationHeadFirstName,
+        organizationHeadMiddleName: data.organizationHeadMiddleName || "",
+        organizationHeadLastName: data.organizationHeadLastName,
+        organizationHeadPhoneNumber: data.organizationHeadPhoneNumber || "",
+        latitude: data.latitude,
+        longitude: data.longitude,
+      };
+      const response = await authServiceRequests.registerOrganization(payload, 2);
 
-      const result = await response.json();
-
-      if (!response.ok) {
-        setError(result.message || "Registration failed");
+      if (!response.success) {
+        setError(response.message || "Registration failed");
+        toast.error("Action Failed", {
+          description: response?.message || "Registration failed",
+        });
         return;
       }
 
+      toast.success("Action Successful", {
+        description: response?.message || "Registration completed successfully",
+      });
       router.push("/login?registered=true");
     } catch (err) {
       setError("An error occurred. Please try again.");
+      toast.error("Action Failed", {
+        description: err?.message || "Registration failed",
+      });
       console.error(err);
     }
   };
