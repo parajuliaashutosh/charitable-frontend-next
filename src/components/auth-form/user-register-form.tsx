@@ -1,5 +1,4 @@
 "use client";
-
 import { userRegistrationSchema } from "@/schema/auth.schema";
 import authServiceRequests from "@/transport/gateway/gRPC/requests/auth/auth-requests";
 import { RegisterUserRequest } from "@/transport/gateway/gRPC/stubs/exposed-auth";

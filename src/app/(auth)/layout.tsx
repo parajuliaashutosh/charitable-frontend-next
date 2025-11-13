@@ -50,7 +50,7 @@ export default function AuthLayout({
             <div className="relative w-full h-96 flex items-center justify-center">
               {/* Image 1 - Top Left */}
               <div className="absolute top-0 left-8 w-24 h-24 rounded-full overflow-hidden border-4 border-background shadow-lg transform -rotate-12 hover:scale-110 transition-transform">
-                <img src="/" alt="Community member" className="w-full h-full object-cover" />
+                <img src="/landing/girl_receiving_books.webp" alt="A Nepali Girl Receiving books" className="w-full h-full object-cover" />
               </div>
 
               {/* Image 2 - Top Right */}
@@ -64,7 +64,7 @@ export default function AuthLayout({
 
               {/* Image 3 - Center */}
               <div className="absolute w-32 h-32 rounded-full overflow-hidden border-4 border-background shadow-xl hover:scale-110 transition-transform">
-                <img src="/" alt="Diverse group" className="w-full h-full object-cover" />
+                <img src="/landing/kid.webp" alt="Happy Kid" className="w-full h-full object-cover" />
               </div>
 
               {/* Image 4 - Bottom Left */}
@@ -74,7 +74,7 @@ export default function AuthLayout({
 
               {/* Image 5 - Bottom Right */}
               <div className="absolute bottom-16 right-8 w-24 h-24 rounded-full overflow-hidden border-4 border-background shadow-lg transform rotate-6 hover:scale-110 transition-transform">
-                <img src="/" alt="Volunteers working" className="w-full h-full object-cover" />
+                <img src="/landing/receiving_books.webp" alt="Volunteers working" className="w-full h-full object-cover" />
               </div>
             </div>
 

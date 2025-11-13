@@ -1,6 +1,7 @@
 "use client"
 
 import { Button } from "@/components/ui/button"
+import { LocalStorageKeys, localStorageService } from "@/store/local-storage/loca-storage-service"
 import authServiceRequests from "@/transport/gateway/gRPC/requests/auth/auth-requests"
 import { yupResolver } from "@hookform/resolvers/yup"
 import Link from "next/link"
@@ -47,8 +48,8 @@ export default function LoginForm() {
         password: data.password,
       }, 3);
 
-      localStorage.setItem("accessToken", response?.data?.accessToken || "")
-      localStorage.setItem("refreshToken", response?.data?.refreshToken || "")
+      localStorageService.setItem(LocalStorageKeys.ACCESS_TOKEN, response?.data?.accessToken || "")
+      localStorageService.setItem(LocalStorageKeys.REFRESH_TOKEN, response?.data?.refreshToken || "")
 
       const resp = await authServiceRequests.myInfo({} , 3);
       console.log("🚀 ~ onSubmit ~ resp:", resp)
