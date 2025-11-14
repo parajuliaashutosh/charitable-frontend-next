@@ -1,6 +1,6 @@
+import { RoleMapper } from "@/constants/role.enum";
 import { logger } from "@/lib/logger";
 import authServiceRequests from "@/transport/gateway/gRPC/requests/auth/auth-requests";
-import { Role } from "@/transport/gateway/gRPC/stubs/exposed-common";
 import { NextAuthOptions, User } from "next-auth";
 import Credentials from "next-auth/providers/credentials";
 
@@ -35,7 +35,7 @@ export const options: NextAuthOptions = {
             return {
               id: userData?.id,
               email: userData?.email,
-              role: userData?.role as Role,
+              role: RoleMapper.toAuthRole(userData?.role),
               phoneNumber: userData?.phone || "",
               accessToken: res.data?.accessToken || "",
               refreshToken: res.data?.refreshToken || "",
@@ -65,7 +65,7 @@ export const options: NextAuthOptions = {
       session.user = {
         id: token.id,
         email: token.email,
-        role: token.role as Role,
+        role: token.role,
       };
       session.accessToken = token.accessToken;
       session.refreshToken = token.refreshToken;

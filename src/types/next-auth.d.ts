@@ -1,11 +1,11 @@
-import { Role } from '@/transport/gateway/gRPC/stubs/exposed-common'
+import { AuthRole } from '@/constants/role.enum'
 import { DefaultSession, DefaultUser } from 'next-auth'
 
 declare module 'next-auth' {
   interface Session {
     user?: {
       id: string
-      role: Role
+      role: AuthRole
       email: string
       phoneNumber?: string
     } & DefaultSession['user']
@@ -15,7 +15,7 @@ declare module 'next-auth' {
 
   export interface User extends DefaultUser {
     id: string
-    role: Role
+    role: AuthRole
     phoneNumber: string
     accessToken?: string
     refreshToken?: string
@@ -26,7 +26,7 @@ declare module 'next-auth/jwt' {
   interface JWT {
     id: string
     email: string
-    role: Role
+    role: AuthRole
     accessToken?: string
     refreshToken?: string
   }

@@ -124,9 +124,13 @@ export enum Role {
      */
     USER = 3,
     /**
-     * @generated from protobuf enum value: ORGANIZATION = 4;
+     * @generated from protobuf enum value: ORGANIZATION_SUPER_ADMIN = 4;
      */
-    ORGANIZATION = 4
+    ORGANIZATION_SUPER_ADMIN = 4,
+    /**
+     * @generated from protobuf enum value: ORGANIZATION_ADMIN = 5;
+     */
+    ORGANIZATION_ADMIN = 5
 }
 /**
  * @generated from protobuf enum AuthStatus
