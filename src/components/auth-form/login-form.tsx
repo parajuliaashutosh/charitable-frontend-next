@@ -1,9 +1,9 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
+import { AuthRole } from "@/constants/role.enum";
 import { logger } from "@/lib/logger";
 import { loginSchema } from "@/schema/auth.schema";
-import { Role } from "@/transport/gateway/gRPC/stubs/exposed-common";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { getSession, signIn } from "next-auth/react";
 import Link from "next/link";
@@ -49,15 +49,20 @@ export default function LoginForm() {
 
       if (response?.ok) {
         // Fetch user session to get the role
-        const session = await getSession(); // from 'next-auth/react'
+        const session = await getSession();
 
-        // Check role and redirect accordingly
-        if (session?.user?.role === Role.SUDO_ADMIN) {
-          router.push("/dashboard");
-        } else if (session?.user?.role === Role.USER) {
-          router.push("/donate");
-        } else {
-          router.push("/"); // fallback
+        const role = session?.user?.role;
+        switch (role) {
+          case AuthRole.SUDO_ADMIN:
+          case AuthRole.ADMIN:
+            return router.push("/dashboard");
+          case AuthRole.ORGANIZATION_SUPER_ADMIN:
+          case AuthRole.ORGANIZATION_ADMIN:
+            return router.push("/donations");
+          case AuthRole.USER:
+            return router.push("/donate");
+          default:
+            return router.push("/login");
         }
       } else {
         toast.error(response?.error || "Invalid username or password.");
