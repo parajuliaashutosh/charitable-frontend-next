@@ -1,3 +1,4 @@
+import { logger } from "@/lib/logger";
 import authServiceRequests from "@/transport/gateway/gRPC/requests/auth/auth-requests";
 import { Role } from "@/transport/gateway/gRPC/stubs/exposed-common";
 import { NextAuthOptions, User } from "next-auth";
@@ -22,7 +23,7 @@ export const options: NextAuthOptions = {
             },
             3
           );
-          console.log("Authorize response:", res);
+          logger.log("Authorize response:", res);
 
           const resp = await authServiceRequests.myInfo({}, 3, {
             meta: {
@@ -32,7 +33,7 @@ export const options: NextAuthOptions = {
           const userData = resp?.data;
           if (res.success) {
             return {
-              id: userData?.email,
+              id: userData?.id,
               email: userData?.email,
               role: userData?.role as Role,
               phoneNumber: userData?.phone || "",
@@ -40,10 +41,10 @@ export const options: NextAuthOptions = {
               refreshToken: res.data?.refreshToken || "",
             } as User;
           } else {
-            return null;
+            throw new Error(res.message || "Login failed");
           }
         } catch (error) {
-          console.error("Authorize error:", error);
+          logger.error("Authorize error:", error);
           throw error;
         }
       },
@@ -51,8 +52,6 @@ export const options: NextAuthOptions = {
   ],
   callbacks: {
     async jwt({ token, user }) {
-      console.log("🚀 ~ jwt token:", token);
-      console.log("🚀 ~ jwt user:", user);
       if (user) {
         token.accessToken = user.accessToken;
         token.refreshToken = user.refreshToken;
@@ -60,8 +59,6 @@ export const options: NextAuthOptions = {
       return token;
     },
     async session({ session, token }) {
-      console.log("🚀 ~ token:", token);
-      console.log("🚀 ~ session:", session);
       session.accessToken = token.accessToken;
       session.refreshToken = token.refreshToken;
       return session;

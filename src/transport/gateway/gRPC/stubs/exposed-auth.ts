@@ -232,27 +232,35 @@ export interface UpdateAuthStatusRequest {
  */
 export interface MyInfoData {
     /**
-     * @generated from protobuf field: string email = 1
+     * @generated from protobuf field: string id = 1
+     */
+    id: string;
+    /**
+     * @generated from protobuf field: string createdAt = 2
+     */
+    createdAt: string;
+    /**
+     * @generated from protobuf field: string email = 3
      */
     email: string;
     /**
-     * @generated from protobuf field: string phone = 2
+     * @generated from protobuf field: string phone = 4
      */
     phone: string;
     /**
-     * @generated from protobuf field: Role role = 3
+     * @generated from protobuf field: Role role = 5
      */
     role: Role;
     /**
-     * @generated from protobuf field: AuthStatus status = 4
+     * @generated from protobuf field: AuthStatus status = 6
      */
     status: AuthStatus;
     /**
-     * @generated from protobuf field: Organization organization = 5
+     * @generated from protobuf field: Organization organization = 7
      */
     organization?: Organization;
     /**
-     * @generated from protobuf field: User user = 6
+     * @generated from protobuf field: User user = 8
      */
     user?: User;
 }
@@ -984,16 +992,20 @@ export const UpdateAuthStatusRequest = new UpdateAuthStatusRequest$Type();
 class MyInfoData$Type extends MessageType<MyInfoData> {
     constructor() {
         super("MyInfoData", [
-            { no: 1, name: "email", kind: "scalar", T: 9 /*ScalarType.STRING*/ },
-            { no: 2, name: "phone", kind: "scalar", T: 9 /*ScalarType.STRING*/ },
-            { no: 3, name: "role", kind: "enum", T: () => ["Role", Role] },
-            { no: 4, name: "status", kind: "enum", T: () => ["AuthStatus", AuthStatus] },
-            { no: 5, name: "organization", kind: "message", T: () => Organization },
-            { no: 6, name: "user", kind: "message", T: () => User }
+            { no: 1, name: "id", kind: "scalar", T: 9 /*ScalarType.STRING*/ },
+            { no: 2, name: "createdAt", kind: "scalar", T: 9 /*ScalarType.STRING*/ },
+            { no: 3, name: "email", kind: "scalar", T: 9 /*ScalarType.STRING*/ },
+            { no: 4, name: "phone", kind: "scalar", T: 9 /*ScalarType.STRING*/ },
+            { no: 5, name: "role", kind: "enum", T: () => ["Role", Role] },
+            { no: 6, name: "status", kind: "enum", T: () => ["AuthStatus", AuthStatus] },
+            { no: 7, name: "organization", kind: "message", T: () => Organization },
+            { no: 8, name: "user", kind: "message", T: () => User }
         ]);
     }
     create(value?: PartialMessage<MyInfoData>): MyInfoData {
         const message = globalThis.Object.create((this.messagePrototype!));
+        message.id = "";
+        message.createdAt = "";
         message.email = "";
         message.phone = "";
         message.role = 0;
@@ -1007,22 +1019,28 @@ class MyInfoData$Type extends MessageType<MyInfoData> {
         while (reader.pos < end) {
             let [fieldNo, wireType] = reader.tag();
             switch (fieldNo) {
-                case /* string email */ 1:
+                case /* string id */ 1:
+                    message.id = reader.string();
+                    break;
+                case /* string createdAt */ 2:
+                    message.createdAt = reader.string();
+                    break;
+                case /* string email */ 3:
                     message.email = reader.string();
                     break;
-                case /* string phone */ 2:
+                case /* string phone */ 4:
                     message.phone = reader.string();
                     break;
-                case /* Role role */ 3:
+                case /* Role role */ 5:
                     message.role = reader.int32();
                     break;
-                case /* AuthStatus status */ 4:
+                case /* AuthStatus status */ 6:
                     message.status = reader.int32();
                     break;
-                case /* Organization organization */ 5:
+                case /* Organization organization */ 7:
                     message.organization = Organization.internalBinaryRead(reader, reader.uint32(), options, message.organization);
                     break;
-                case /* User user */ 6:
+                case /* User user */ 8:
                     message.user = User.internalBinaryRead(reader, reader.uint32(), options, message.user);
                     break;
                 default:
@@ -1037,24 +1055,30 @@ class MyInfoData$Type extends MessageType<MyInfoData> {
         return message;
     }
     internalBinaryWrite(message: MyInfoData, writer: IBinaryWriter, options: BinaryWriteOptions): IBinaryWriter {
-        /* string email = 1; */
+        /* string id = 1; */
+        if (message.id !== "")
+            writer.tag(1, WireType.LengthDelimited).string(message.id);
+        /* string createdAt = 2; */
+        if (message.createdAt !== "")
+            writer.tag(2, WireType.LengthDelimited).string(message.createdAt);
+        /* string email = 3; */
         if (message.email !== "")
-            writer.tag(1, WireType.LengthDelimited).string(message.email);
-        /* string phone = 2; */
+            writer.tag(3, WireType.LengthDelimited).string(message.email);
+        /* string phone = 4; */
         if (message.phone !== "")
-            writer.tag(2, WireType.LengthDelimited).string(message.phone);
-        /* Role role = 3; */
+            writer.tag(4, WireType.LengthDelimited).string(message.phone);
+        /* Role role = 5; */
         if (message.role !== 0)
-            writer.tag(3, WireType.Varint).int32(message.role);
-        /* AuthStatus status = 4; */
+            writer.tag(5, WireType.Varint).int32(message.role);
+        /* AuthStatus status = 6; */
         if (message.status !== 0)
-            writer.tag(4, WireType.Varint).int32(message.status);
-        /* Organization organization = 5; */
+            writer.tag(6, WireType.Varint).int32(message.status);
+        /* Organization organization = 7; */
         if (message.organization)
-            Organization.internalBinaryWrite(message.organization, writer.tag(5, WireType.LengthDelimited).fork(), options).join();
-        /* User user = 6; */
+            Organization.internalBinaryWrite(message.organization, writer.tag(7, WireType.LengthDelimited).fork(), options).join();
+        /* User user = 8; */
         if (message.user)
-            User.internalBinaryWrite(message.user, writer.tag(6, WireType.LengthDelimited).fork(), options).join();
+            User.internalBinaryWrite(message.user, writer.tag(8, WireType.LengthDelimited).fork(), options).join();
         let u = options.writeUnknownFields;
         if (u !== false)
             (u == true ? UnknownFieldHandler.onWrite : u)(this.typeName, message, writer);

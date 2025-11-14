@@ -1,6 +1,7 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
+import { logger } from "@/lib/logger";
 import { loginSchema } from "@/schema/auth.schema";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { signIn } from "next-auth/react";
@@ -8,6 +9,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
+import { toast } from "sonner";
 import { FormLabel } from "../ui/form";
 import { Input } from "../ui/input";
 
@@ -42,14 +44,16 @@ export default function LoginForm() {
         callbackUrl: "/",
       });
 
-      console.log("🚀 ~ onSubmit ~ response:", response);
-      // const resp = await authServiceRequests.myInfo({}, 3);
-      // console.log("🚀 ~ onSubmit ~ resp:", resp);
-      // For now, just redirect to dashboard
-      router.push("/dashboard");
+      logger.log("🚀 ~ onSubmit ~ response:", response);
+
+      if(response?.ok) {
+        router.push("/dashboard");
+      } else {
+        toast.error(response?.error || "Invalid username or password.");
+      }
     } catch (err) {
-      setError("An error occurred. Please try again.");
-      console.error("Login error:", err);
+      logger.error("Login error:", err);
+      toast.error(err?.error || err?.message || "Invalid username or password.");
     }
   };
 
