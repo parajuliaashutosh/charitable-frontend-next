@@ -1,4 +1,5 @@
 import NextAuthProvider from "@/providers/next-auth-providers";
+import { ensureInterceptorRegistry } from "@/transport/gateway/gRPC/grpc-helper";
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import { Toaster } from "sonner";
@@ -24,6 +25,8 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  ensureInterceptorRegistry();
+
   return (
     <html lang="en">
       <body
