@@ -62,6 +62,11 @@ export const options: NextAuthOptions = {
       return token;
     },
     async session({ session, token }) {
+      session.user = {
+        id: token.id,
+        email: token.email,
+        role: token.role as Role,
+      };
       session.accessToken = token.accessToken;
       session.refreshToken = token.refreshToken;
       return session;
