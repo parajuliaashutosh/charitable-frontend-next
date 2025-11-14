@@ -1,12 +1,13 @@
+import UserNavbar from "@/components/common/user-navbar/user-navbar";
 import type { Metadata } from "next";
-
 
 export const metadata: Metadata = {
   title: {
     template: "%s | Give Hope",
     default: "Donate | Give Hope",
   },
-  description: "Make a donation to Give Hope and help us create a better world together.",
+  description:
+    "Make a donation to Give Hope and help us create a better world together.",
   keywords: ["donate", "charity", "give hope", "support", "cause"],
   authors: [{ name: "Give Hope" }],
   robots: {
@@ -27,5 +28,10 @@ export default function DonateLayout({
 }: {
   children: React.ReactNode;
 }) {
-  return <div className="min-h-screen bg-background">{children}</div>;
+  return (
+    <div className="min-h-screen bg-background">
+      <UserNavbar />
+      {children}
+    </div>
+  );
 }

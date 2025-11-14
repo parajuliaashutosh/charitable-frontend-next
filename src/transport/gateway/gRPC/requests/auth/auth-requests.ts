@@ -5,7 +5,7 @@ import { CustomGrpcInterceptor } from "../../grpc-interceptor";
 import { LoginRequest, LoginResponse, MyInfoResponse, RegisterOrganizationRequest, RegisterUserRequest } from "../../stubs/exposed-auth";
 import { CommonResponse, EmptyRequest } from "../../stubs/exposed-common";
 
-const grpcInterceptor = InterceptorRegistry.getInstance().getInterceptor('grpc') as CustomGrpcInterceptor;
+const grpcInterceptor = InterceptorRegistry.getInstance().getInterceptor('grpc')! as CustomGrpcInterceptor;
 
 const login = (request: LoginRequest, retryTimes: number): Promise<LoginResponse> => {
 	return grpcInterceptor.intercept({

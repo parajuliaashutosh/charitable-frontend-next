@@ -2,11 +2,11 @@ import { InterceptorRegistry } from "@/transport/interceptor-registry";
 import serviceClients from "../../client/client-registry";
 import { CustomGrpcInterceptor } from "../../grpc-interceptor";
 import { CommonResponse } from "../../stubs/exposed-common";
-import { ClaimDonationRequest, GetDonationRequest, GetDonationResponse, GotDonationRequest } from "../../stubs/exposed-donation";
+import { ClaimDonationRequest, GetDonationRequest, GetDonationResponse, GotDonationRequest, UserDonationRequest } from "../../stubs/exposed-donation";
 
 const grpcInterceptor = InterceptorRegistry.getInstance().getInterceptor('grpc') as CustomGrpcInterceptor;
 
-const donate = (request: GetDonationRequest, retryTimes: number): Promise<GetDonationResponse> => {
+const donate = (request: UserDonationRequest, retryTimes: number): Promise<CommonResponse> => {
     return grpcInterceptor.intercept({
         client: serviceClients.donationServiceClient,
         method: (client) => client.donate.bind(client),

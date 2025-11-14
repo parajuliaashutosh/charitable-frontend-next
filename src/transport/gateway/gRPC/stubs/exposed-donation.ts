@@ -35,6 +35,14 @@ export interface UserDonationRequest {
      * @generated from protobuf field: string product_url = 4
      */
     productUrl: string;
+    /**
+     * @generated from protobuf field: float lat = 5
+     */
+    lat: number;
+    /**
+     * @generated from protobuf field: float long = 6
+     */
+    long: number;
 }
 /**
  * @generated from protobuf message GetDonationRequest
@@ -153,7 +161,9 @@ class UserDonationRequest$Type extends MessageType<UserDonationRequest> {
             { no: 1, name: "title", kind: "scalar", T: 9 /*ScalarType.STRING*/ },
             { no: 2, name: "description", kind: "scalar", T: 9 /*ScalarType.STRING*/ },
             { no: 3, name: "type", kind: "enum", T: () => ["DonationType", DonationType] },
-            { no: 4, name: "product_url", kind: "scalar", T: 9 /*ScalarType.STRING*/ }
+            { no: 4, name: "product_url", kind: "scalar", T: 9 /*ScalarType.STRING*/ },
+            { no: 5, name: "lat", kind: "scalar", T: 2 /*ScalarType.FLOAT*/ },
+            { no: 6, name: "long", kind: "scalar", T: 2 /*ScalarType.FLOAT*/ }
         ]);
     }
     create(value?: PartialMessage<UserDonationRequest>): UserDonationRequest {
@@ -162,6 +172,8 @@ class UserDonationRequest$Type extends MessageType<UserDonationRequest> {
         message.description = "";
         message.type = 0;
         message.productUrl = "";
+        message.lat = 0;
+        message.long = 0;
         if (value !== undefined)
             reflectionMergePartial<UserDonationRequest>(this, message, value);
         return message;
@@ -182,6 +194,12 @@ class UserDonationRequest$Type extends MessageType<UserDonationRequest> {
                     break;
                 case /* string product_url */ 4:
                     message.productUrl = reader.string();
+                    break;
+                case /* float lat */ 5:
+                    message.lat = reader.float();
+                    break;
+                case /* float long */ 6:
+                    message.long = reader.float();
                     break;
                 default:
                     let u = options.readUnknownField;
@@ -207,6 +225,12 @@ class UserDonationRequest$Type extends MessageType<UserDonationRequest> {
         /* string product_url = 4; */
         if (message.productUrl !== "")
             writer.tag(4, WireType.LengthDelimited).string(message.productUrl);
+        /* float lat = 5; */
+        if (message.lat !== 0)
+            writer.tag(5, WireType.Bit32).float(message.lat);
+        /* float long = 6; */
+        if (message.long !== 0)
+            writer.tag(6, WireType.Bit32).float(message.long);
         let u = options.writeUnknownFields;
         if (u !== false)
             (u == true ? UnknownFieldHandler.onWrite : u)(this.typeName, message, writer);

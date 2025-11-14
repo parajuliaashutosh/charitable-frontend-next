@@ -6,6 +6,7 @@ import Hero from "@/components/landing/hero";
 import Organization from "@/components/landing/organization";
 
 export default function Page() {
+
   return (
     <div className="min-h-screen bg-background">
       <Header />

@@ -18,5 +18,5 @@ export const FormLabel = ({
 }
 
 export const FormError = ({ error }: { error: string | undefined }) => {
-  return <p className='text-destructive text-[12px] pt-1'>{error}</p>
+  return <p className='text-destructive text-xs h-4'>{error}</p>
 }

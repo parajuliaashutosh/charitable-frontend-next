@@ -8,7 +8,6 @@ import { yupResolver } from "@hookform/resolvers/yup";
 import { getSession, signIn } from "next-auth/react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { FormLabel } from "../ui/form";
@@ -21,7 +20,6 @@ interface ILoginFormData {
 
 export default function LoginForm() {
   const router = useRouter();
-  const [error, setError] = useState<string | null>(null);
 
   const {
     register,
@@ -36,7 +34,6 @@ export default function LoginForm() {
   });
 
   const onSubmit = async (data: ILoginFormData) => {
-    setError(null);
     try {
       const response = await signIn("credentials", {
         username: data.username,
@@ -76,16 +73,9 @@ export default function LoginForm() {
   };
 
   return (
-    <form onSubmit={handleSubmit(onSubmit)} className="space-y-6 w-full">
-      {/* Error Message */}
-      {error && (
-        <div className="bg-destructive/10 border border-destructive text-destructive px-4 py-3 rounded-lg text-sm">
-          {error}
-        </div>
-      )}
+    <form onSubmit={handleSubmit(onSubmit)} className="space-y-4 w-full">
 
       {/* Email/Username Field */}
-
       <Input
         label="Username"
         id="username"

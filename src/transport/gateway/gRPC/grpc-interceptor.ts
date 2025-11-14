@@ -1,4 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
+import { requireAuth } from "@/lib/auth";
 import { RpcOptions, UnaryCall } from "@protobuf-ts/runtime-rpc";
 
 type GrpcInterceptParams<
@@ -28,13 +29,15 @@ export class CustomGrpcInterceptor {
     options = {},
   }: GrpcInterceptParams<TClient, TRequest, TResponse>): Promise<TResponse> {
 
-    // const token = localStorageService.getItem(LocalStorageKeys.ACCESS_TOKEN);
-    // const authMeta = token ? { Authorization: `Bearer ${token}` } : {};
+    const tokens = await requireAuth();
+    
+    const accessToken = tokens?.accessToken;
+    const authMeta = accessToken ? { Authorization: `Bearer ${accessToken}` } : {};
 
     const meta = {
       ...(options?.meta || {}),
       "x-retry-config": JSON.stringify({ maxRetries: retries }),
-      // ...authMeta,
+      ...authMeta,
     };
     const rpcOptions: RpcOptions = { ...options, meta };
 

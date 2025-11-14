@@ -1,3 +1,5 @@
+"use client";
+
 import { LucideEye, LucideEyeOff } from "lucide-react";
 import * as React from "react";
 import { FieldError } from "react-hook-form";
