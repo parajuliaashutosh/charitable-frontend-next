@@ -1,24 +1,11 @@
 import { DonationCard } from "@/components/common/donations/donation-card";
 import { Button } from "@/components/ui/button";
 import { Empty } from "@/components/ui/empty";
-import { auth } from "@/lib/auth";
 import { donationServiceClient } from "@/transport/gateway/gRPC/requests/donation/donation-requests";
 import { Gift } from "lucide-react";
 import Link from 'next/link';
 
 export default async function DonationsPage() {
-  const session = await auth();
-
-  // Fetch donations from your gRPC service
-  // const response = await donationServiceRequests.listDonations({
-  //   userId: session.user.id,
-  // }, 3, {
-  //   meta: {
-  //     Authorization: `Bearer ${session.accessToken}`,
-  //   },
-  // });
-
-  // Mock data for demonstration
 
   let donations;
   try {

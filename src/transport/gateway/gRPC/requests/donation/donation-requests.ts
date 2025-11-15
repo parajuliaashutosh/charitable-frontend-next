@@ -53,6 +53,7 @@ const gotDonation = (request: GotDonationRequest, retryTimes: number = 2): Promi
 
 export const donationServiceClient = {
     donate,
+    getDonations,
     getMyDonations,
     claimDonation,
     gotDonation
