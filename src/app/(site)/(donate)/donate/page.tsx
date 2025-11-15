@@ -2,6 +2,7 @@ import { DonationCard } from "@/components/common/donations/donation-card";
 import { Button } from "@/components/ui/button";
 import { Empty } from "@/components/ui/empty";
 import { auth } from "@/lib/auth";
+import { donationServiceClient } from "@/transport/gateway/gRPC/requests/donation/donation-requests";
 import { Gift } from "lucide-react";
 import Link from 'next/link';
 
@@ -18,28 +19,18 @@ export default async function DonationsPage() {
   // });
 
   // Mock data for demonstration
-  const donations = [
-    {
-      id: "1",
-      title: "Mathematics Textbooks",
-      description:
-        "Complete set of high school mathematics textbooks in excellent condition",
-      type: "EDUCATIONAL" as const,
-      status: "PENDING" as const,
-      imageUrl: null,
-      createdAt: new Date("2024-01-15"),
-    },
-    {
-      id: "2",
-      title: "Winter Clothing Bundle",
-      description:
-        "Warm jackets, sweaters, and winter accessories for children",
-      type: "CLOTHING" as const,
-      status: "APPROVED" as const,
-      imageUrl: "/images/clothing-bundle.jpg",
-      createdAt: new Date("2024-01-10"),
-    },
-  ];
+
+  let donations;
+  try {
+    const resp = await donationServiceClient.getMyDonations({
+      page: 1,
+      limit: 20,
+    }, 3);
+    donations = resp?.data?.data;
+  } catch (error) {
+    console.error("Error fetching donations:", JSON.stringify(error, null, 2));
+    donations = [];
+  }
 
   return (
     <div className="flex flex-col container mx-auto px-4 py-8 gap-8">

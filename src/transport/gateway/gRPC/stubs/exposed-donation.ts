@@ -49,25 +49,25 @@ export interface UserDonationRequest {
  */
 export interface GetDonationRequest {
     /**
-     * @generated from protobuf field: int32 page = 1
+     * @generated from protobuf field: optional int32 page = 1
      */
-    page: number;
+    page?: number;
     /**
-     * @generated from protobuf field: int32 limit = 2
+     * @generated from protobuf field: optional int32 limit = 2
      */
-    limit: number;
+    limit?: number;
     /**
-     * @generated from protobuf field: string search = 3
+     * @generated from protobuf field: optional string search = 3
      */
-    search: string;
+    search?: string;
     /**
-     * @generated from protobuf field: DonationType type = 4
+     * @generated from protobuf field: optional DonationType type = 4
      */
-    type: DonationType;
+    type?: DonationType;
     /**
-     * @generated from protobuf field: DonationStatus status = 5
+     * @generated from protobuf field: optional DonationStatus status = 5
      */
-    status: DonationStatus;
+    status?: DonationStatus;
 }
 /**
  * @generated from protobuf message DonationItems
@@ -245,20 +245,15 @@ export const UserDonationRequest = new UserDonationRequest$Type();
 class GetDonationRequest$Type extends MessageType<GetDonationRequest> {
     constructor() {
         super("GetDonationRequest", [
-            { no: 1, name: "page", kind: "scalar", T: 5 /*ScalarType.INT32*/ },
-            { no: 2, name: "limit", kind: "scalar", T: 5 /*ScalarType.INT32*/ },
-            { no: 3, name: "search", kind: "scalar", T: 9 /*ScalarType.STRING*/ },
-            { no: 4, name: "type", kind: "enum", T: () => ["DonationType", DonationType] },
-            { no: 5, name: "status", kind: "enum", T: () => ["DonationStatus", DonationStatus] }
+            { no: 1, name: "page", kind: "scalar", opt: true, T: 5 /*ScalarType.INT32*/ },
+            { no: 2, name: "limit", kind: "scalar", opt: true, T: 5 /*ScalarType.INT32*/ },
+            { no: 3, name: "search", kind: "scalar", opt: true, T: 9 /*ScalarType.STRING*/ },
+            { no: 4, name: "type", kind: "enum", opt: true, T: () => ["DonationType", DonationType] },
+            { no: 5, name: "status", kind: "enum", opt: true, T: () => ["DonationStatus", DonationStatus] }
         ]);
     }
     create(value?: PartialMessage<GetDonationRequest>): GetDonationRequest {
         const message = globalThis.Object.create((this.messagePrototype!));
-        message.page = 0;
-        message.limit = 0;
-        message.search = "";
-        message.type = 0;
-        message.status = 0;
         if (value !== undefined)
             reflectionMergePartial<GetDonationRequest>(this, message, value);
         return message;
@@ -268,19 +263,19 @@ class GetDonationRequest$Type extends MessageType<GetDonationRequest> {
         while (reader.pos < end) {
             let [fieldNo, wireType] = reader.tag();
             switch (fieldNo) {
-                case /* int32 page */ 1:
+                case /* optional int32 page */ 1:
                     message.page = reader.int32();
                     break;
-                case /* int32 limit */ 2:
+                case /* optional int32 limit */ 2:
                     message.limit = reader.int32();
                     break;
-                case /* string search */ 3:
+                case /* optional string search */ 3:
                     message.search = reader.string();
                     break;
-                case /* DonationType type */ 4:
+                case /* optional DonationType type */ 4:
                     message.type = reader.int32();
                     break;
-                case /* DonationStatus status */ 5:
+                case /* optional DonationStatus status */ 5:
                     message.status = reader.int32();
                     break;
                 default:
@@ -295,20 +290,20 @@ class GetDonationRequest$Type extends MessageType<GetDonationRequest> {
         return message;
     }
     internalBinaryWrite(message: GetDonationRequest, writer: IBinaryWriter, options: BinaryWriteOptions): IBinaryWriter {
-        /* int32 page = 1; */
-        if (message.page !== 0)
+        /* optional int32 page = 1; */
+        if (message.page !== undefined)
             writer.tag(1, WireType.Varint).int32(message.page);
-        /* int32 limit = 2; */
-        if (message.limit !== 0)
+        /* optional int32 limit = 2; */
+        if (message.limit !== undefined)
             writer.tag(2, WireType.Varint).int32(message.limit);
-        /* string search = 3; */
-        if (message.search !== "")
+        /* optional string search = 3; */
+        if (message.search !== undefined)
             writer.tag(3, WireType.LengthDelimited).string(message.search);
-        /* DonationType type = 4; */
-        if (message.type !== 0)
+        /* optional DonationType type = 4; */
+        if (message.type !== undefined)
             writer.tag(4, WireType.Varint).int32(message.type);
-        /* DonationStatus status = 5; */
-        if (message.status !== 0)
+        /* optional DonationStatus status = 5; */
+        if (message.status !== undefined)
             writer.tag(5, WireType.Varint).int32(message.status);
         let u = options.writeUnknownFields;
         if (u !== false)

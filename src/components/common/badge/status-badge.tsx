@@ -2,8 +2,8 @@ import { Badge } from "@/components/ui/badge";
 
 function StatusBadge({ status }: { status: string }) {
 
-    function getVariant(status: string) {
-    switch (status.toLowerCase()) {
+    function getVariant(status: string | number) {
+    switch (status) {
       case "available":
         return "secondary";
       case "pending":
