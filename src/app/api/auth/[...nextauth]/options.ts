@@ -1,6 +1,6 @@
 import { RoleMapper } from "@/constants/role.enum";
 import { logger } from "@/lib/logger";
-import authServiceRequests from "@/transport/gateway/gRPC/requests/auth/auth-requests";
+import rawAuthServiceRequests from "@/transport/gateway/gRPC/requests/auth/raw-auth-requests";
 import { NextAuthOptions, User } from "next-auth";
 import Credentials from "next-auth/providers/credentials";
 
@@ -16,7 +16,7 @@ export const options: NextAuthOptions = {
         credentials: Record<"username" | "password", string>,
       ) {
         try {
-          const res = await authServiceRequests.login(
+          const res = await rawAuthServiceRequests.login(
             {
               username: credentials?.username || "",
               password: credentials?.password || "",
@@ -25,7 +25,7 @@ export const options: NextAuthOptions = {
           );
           logger.log("Authorize response:", res);
 
-          const resp = await authServiceRequests.myInfo({}, 3, {
+          const resp = await rawAuthServiceRequests.myInfo({}, 3, {
             meta: {
               Authorization: `Bearer ${res?.data?.accessToken}`,
             },

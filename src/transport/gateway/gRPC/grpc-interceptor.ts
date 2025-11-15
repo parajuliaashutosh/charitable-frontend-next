@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { requireAuth } from "@/lib/auth";
+import { getUserSession } from "@/lib/auth";
 import { RpcOptions, UnaryCall } from "@protobuf-ts/runtime-rpc";
 
 type GrpcInterceptParams<
@@ -29,7 +29,7 @@ export class CustomGrpcInterceptor {
     options = {},
   }: GrpcInterceptParams<TClient, TRequest, TResponse>): Promise<TResponse> {
 
-    const tokens = await requireAuth();
+    const tokens = await getUserSession();
     
     const accessToken = tokens?.accessToken;
     const authMeta = accessToken ? { Authorization: `Bearer ${accessToken}` } : {};

@@ -28,6 +28,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { Controller, useForm } from "react-hook-form";
+import { toast } from "sonner";
 
 // Mock user data
 const CURRENT_USER = {
@@ -113,9 +114,15 @@ export default function DonateItemPage() {
       console.log("Creating donation:", data);
 
       router.push("/donate");
+      toast.success("Action Successful", {
+        description: resp?.message || "Your donation has been created successfully.",
+      });
     } catch (err: any) {
       setError("Failed to create donation. Please try again.");
       setLoading(false);
+      toast.error("Action Failed", {
+        description: err?.message || "An error occurred while creating your donation.",
+      });
     }
   };
 

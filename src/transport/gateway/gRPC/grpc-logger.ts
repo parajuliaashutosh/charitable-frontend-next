@@ -2,7 +2,7 @@
 import { RpcInterceptor, UnaryCall } from "@protobuf-ts/runtime-rpc";
 
 export const grpcLoggerInterceptor: RpcInterceptor = {
-  interceptUnary(next, method, input, options) {
+  interceptUnary(next, method, input, options = {}) {
     // if (!browser || import.meta.env.PROD) {
     //   // Skip logging in production or non-browser
     //   return next(method, input, options);
