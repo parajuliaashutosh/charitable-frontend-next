@@ -51,13 +51,11 @@ const UserNavbar = async () => {
         </div>
 
         {/* Right Section */}
-         
-
-          <UserNavbarButtons
-            notifications={notifications}
-            fullName={fullName}
-            email={email}
-          />
+        <UserNavbarButtons
+          notificationNumber={notifications}
+          fullName={fullName}
+          email={email}
+        />
       </nav>
     </>
   );

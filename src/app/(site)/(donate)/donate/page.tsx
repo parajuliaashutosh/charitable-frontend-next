@@ -1,3 +1,5 @@
+export const dynamic = "force-dynamic";
+
 import { DonationCard } from "@/components/common/donations/donation-card";
 import { Button } from "@/components/ui/button";
 import { Empty } from "@/components/ui/empty";

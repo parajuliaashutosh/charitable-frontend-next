@@ -1,4 +1,3 @@
-// src/app/(auth)/register/organization/page.tsx
 import OrganizationRegisterForm from "@/components/auth-form/organization-register-form";
 import type { Metadata } from "next";
 
