@@ -3,7 +3,6 @@ import { Empty } from "@/components/ui/empty";
 import { donationServiceClient } from "@/transport/gateway/gRPC/requests/donation/donation-requests";
 
 export default async function DonationsPage() {
-
   // Fetch donations from your gRPC service
   // const response = await donationServiceRequests.listDonations({
   //   userId: session.user.id,
@@ -17,10 +16,13 @@ export default async function DonationsPage() {
 
   let donations;
   try {
-    const resp = await donationServiceClient.getDonations({
-      page: 1,
-      limit: 20,
-    }, 3);
+    const resp = await donationServiceClient.getDonations(
+      {
+        page: 1,
+        limit: 20,
+      },
+      3
+    );
     donations = resp?.data?.data;
   } catch (error) {
     console.error("Error fetching donations:", JSON.stringify(error, null, 2));
@@ -37,10 +39,12 @@ export default async function DonationsPage() {
       </div>
 
       {donations.length === 0 ? (
-        <Empty
-          title="No donations yet"
-          description="Start making a difference by creating your first donation"
-        />
+        <Empty>
+          <h3 className="text-lg font-semibold">No donations yet</h3>
+          <p className="text-muted-foreground">
+            There are currently no donations available. Please check back later.
+          </p>
+        </Empty>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {donations.map((donation) => (
