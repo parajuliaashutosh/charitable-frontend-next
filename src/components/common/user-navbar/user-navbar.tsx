@@ -40,14 +40,13 @@ const UserNavbar = async () => {
 
         {/* Center Section - Search */}
         <div className="flex-1 max-w-md mx-4 hidden md:block">
-          <div className="relative">
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
-            <Input
-              type="text"
-              placeholder="Search..."
-              className="pl-10 bg-input border-border text-foreground placeholder:text-muted-foreground focus:ring-primary"
-            />
-          </div>
+          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
+          <Input
+            type="text"
+            placeholder="Search..."
+            className="pl-10 bg-input border-border text-foreground placeholder:text-muted-foreground focus:ring-primary"
+            showErrorPadding={false}
+          />
         </div>
 
         {/* Right Section */}

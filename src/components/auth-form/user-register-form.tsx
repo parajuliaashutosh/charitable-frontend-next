@@ -3,6 +3,7 @@ import { userRegistrationSchema } from "@/schema/auth.schema";
 import authServiceRequests from "@/transport/gateway/gRPC/requests/auth/auth-requests";
 import { RegisterUserRequest } from "@/transport/gateway/gRPC/stubs/exposed-auth";
 import { yupResolver } from "@hookform/resolvers/yup";
+import { Lock, Mail, Phone, User } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
@@ -127,6 +128,7 @@ export default function UserRegisterForm() {
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <Input
+                    icon={<User size={16} />}
                     label="First Name"
                     id="firstName"
                     required
@@ -136,6 +138,7 @@ export default function UserRegisterForm() {
                     className="w-full"
                   />
                   <Input
+                    icon={<User size={16} />}
                     label="Middle Name"
                     id="middleName"
                     placeholder="Michael"
@@ -147,6 +150,7 @@ export default function UserRegisterForm() {
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <Input
                     label="Last Name"
+                    icon={<User size={16} />}
                     id="lastName"
                     required
                     placeholder="Doe"
@@ -157,6 +161,7 @@ export default function UserRegisterForm() {
 
                   <Input
                     label="Phone Number"
+                    icon={<Phone size={16} />}
                     id="phoneNumber"
                     type="tel"
                     required
@@ -175,6 +180,7 @@ export default function UserRegisterForm() {
                 <div className="space-y-2">
                   <Input
                     label="Email Address"
+                    icon={<Mail size={16} />}
                     id="email"
                     type="email"
                     required
@@ -189,6 +195,7 @@ export default function UserRegisterForm() {
                   <div className="space-y-2">
                     <Input
                       label="Password"
+                      icon={<Lock size={16} />}
                       id="password"
                       type="password"
                       required
@@ -200,6 +207,7 @@ export default function UserRegisterForm() {
                   </div>
                   <div className="space-y-2">
                     <Input
+                      icon={<Lock size={16} />}
                       label="Confirm Password"
                       id="confirmPassword"
                       type="password"

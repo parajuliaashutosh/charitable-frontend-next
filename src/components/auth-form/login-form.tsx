@@ -5,6 +5,7 @@ import { AuthRole } from "@/constants/role.enum";
 import { logger } from "@/lib/logger";
 import { loginSchema } from "@/schema/auth.schema";
 import { yupResolver } from "@hookform/resolvers/yup";
+import { Lock, Mail } from "lucide-react";
 import { getSession, signIn } from "next-auth/react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -78,6 +79,7 @@ export default function LoginForm() {
       {/* Email/Username Field */}
       <Input
         label="Username"
+        icon={<Mail size={16} />}
         id="username"
         type="text"
         placeholder="Enter your email or phone"
@@ -99,6 +101,7 @@ export default function LoginForm() {
         </div>
         <Input
           id="password"
+          icon={<Lock size={16} />}
           type="password"
           placeholder="Enter your password"
           {...register("password")}

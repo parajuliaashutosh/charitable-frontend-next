@@ -12,11 +12,12 @@ export interface InputProps
   label?: string;
   required?: boolean;
   helperText?: string;
+  showErrorPadding?: boolean;
 }
 
 const Input = React.memo(
   React.forwardRef<HTMLInputElement, InputProps>(
-    ({ className, label, required, icon, error, type, ...props }, ref) => {
+    ({ className, label, required, icon, error, type, showErrorPadding, ...props }, ref) => {
       const containerClassNames = React.useMemo(() => {
         const baseClasses =
           "flex rounded-[4px] bg-background w-full border   px-3 h-9 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium  disabled:cursor-not-allowed disabled:opacity-50";
@@ -64,7 +65,9 @@ const Input = React.memo(
               {show ? <LucideEye size={16} /> : <LucideEyeOff size={16} />}
             </div>
           </div>
-          <FormError error={error?.message} />
+          {showErrorPadding || error ? (
+            <FormError error={error?.message} />
+          ) : null}
           {props.helperText ? <small>{props.helperText}</small> : ""}
         </div>
       );
