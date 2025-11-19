@@ -68,6 +68,7 @@ export const options: NextAuthOptions = {
 
       // Token expired → refresh
       try {
+        logger.log("Refreshing access token...");
         const refreshed = await rawAuthServiceRequests.refreshToken({
           refreshToken: token.refreshToken,
         });
@@ -76,7 +77,7 @@ export const options: NextAuthOptions = {
         token.refreshToken = refreshed.data.refreshToken;
         token.expiresAt = getRefreshTokenAfter();
       } catch (err) {
-        console.error("Refresh token failed:", err);
+        logger.error("Refresh token failed:", err);
         return token;
       }
       return token;
