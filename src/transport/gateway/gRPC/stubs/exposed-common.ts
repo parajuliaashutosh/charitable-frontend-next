@@ -62,25 +62,128 @@ export interface Organization {
  */
 export interface User {
     /**
-     * @generated from protobuf field: string firstName = 1
+     * @generated from protobuf field: string id = 1
+     */
+    id: string;
+    /**
+     * @generated from protobuf field: string createdAt = 2
+     */
+    createdAt: string;
+    /**
+     * @generated from protobuf field: string firstName = 3
      */
     firstName: string;
     /**
-     * @generated from protobuf field: string middleName = 2
+     * @generated from protobuf field: string middleName = 4
      */
     middleName: string;
     /**
-     * @generated from protobuf field: string lastName = 3
+     * @generated from protobuf field: string lastName = 5
      */
     lastName: string;
     /**
-     * @generated from protobuf field: float latitude = 4
+     * @generated from protobuf field: float latitude = 6
      */
     latitude: number;
     /**
-     * @generated from protobuf field: float longitude = 5
+     * @generated from protobuf field: float longitude = 7
      */
     longitude: number;
+}
+/**
+ * @generated from protobuf message Auth
+ */
+export interface Auth {
+    /**
+     * @generated from protobuf field: string id = 1
+     */
+    id: string;
+    /**
+     * @generated from protobuf field: string createdAt = 2
+     */
+    createdAt: string;
+    /**
+     * @generated from protobuf field: string email = 3
+     */
+    email: string;
+    /**
+     * @generated from protobuf field: string phone = 7
+     */
+    phone: string;
+    /**
+     * @generated from protobuf field: string isEmailVerified = 4
+     */
+    isEmailVerified: string;
+    /**
+     * @generated from protobuf field: Role role = 5
+     */
+    role: Role;
+    /**
+     * @generated from protobuf field: AuthStatus status = 6
+     */
+    status: AuthStatus;
+}
+/**
+ * @generated from protobuf message AuthStatusHistory
+ */
+export interface AuthStatusHistory {
+    /**
+     * @generated from protobuf field: string id = 1
+     */
+    id: string;
+    /**
+     * @generated from protobuf field: string createdAt = 2
+     */
+    createdAt: string;
+    /**
+     * @generated from protobuf field: AuthStatus status = 3
+     */
+    status: AuthStatus;
+}
+/**
+ * @generated from protobuf message AuthDetail
+ */
+export interface AuthDetail {
+    /**
+     * @generated from protobuf field: string id = 1
+     */
+    id: string;
+    /**
+     * @generated from protobuf field: string createdAt = 2
+     */
+    createdAt: string;
+    /**
+     * @generated from protobuf field: string email = 3
+     */
+    email: string;
+    /**
+     * @generated from protobuf field: string phone = 4
+     */
+    phone: string;
+    /**
+     * @generated from protobuf field: string isEmailVerified = 5
+     */
+    isEmailVerified: string;
+    /**
+     * @generated from protobuf field: Role role = 6
+     */
+    role: Role;
+    /**
+     * @generated from protobuf field: AuthStatus status = 7
+     */
+    status: AuthStatus;
+    /**
+     * @generated from protobuf field: repeated AuthStatusHistory history = 8
+     */
+    history: AuthStatusHistory[];
+    /**
+     * @generated from protobuf field: string emailVerificationToken = 9
+     */
+    emailVerificationToken: string;
+    /**
+     * @generated from protobuf field: string emailVerificationPublishAt = 10
+     */
+    emailVerificationPublishAt: string;
 }
 /**
  * @generated from protobuf message Pagination
@@ -383,15 +486,19 @@ export const Organization = new Organization$Type();
 class User$Type extends MessageType<User> {
     constructor() {
         super("User", [
-            { no: 1, name: "firstName", kind: "scalar", T: 9 /*ScalarType.STRING*/ },
-            { no: 2, name: "middleName", kind: "scalar", T: 9 /*ScalarType.STRING*/ },
-            { no: 3, name: "lastName", kind: "scalar", T: 9 /*ScalarType.STRING*/ },
-            { no: 4, name: "latitude", kind: "scalar", T: 2 /*ScalarType.FLOAT*/ },
-            { no: 5, name: "longitude", kind: "scalar", T: 2 /*ScalarType.FLOAT*/ }
+            { no: 1, name: "id", kind: "scalar", T: 9 /*ScalarType.STRING*/ },
+            { no: 2, name: "createdAt", kind: "scalar", T: 9 /*ScalarType.STRING*/ },
+            { no: 3, name: "firstName", kind: "scalar", T: 9 /*ScalarType.STRING*/ },
+            { no: 4, name: "middleName", kind: "scalar", T: 9 /*ScalarType.STRING*/ },
+            { no: 5, name: "lastName", kind: "scalar", T: 9 /*ScalarType.STRING*/ },
+            { no: 6, name: "latitude", kind: "scalar", T: 2 /*ScalarType.FLOAT*/ },
+            { no: 7, name: "longitude", kind: "scalar", T: 2 /*ScalarType.FLOAT*/ }
         ]);
     }
     create(value?: PartialMessage<User>): User {
         const message = globalThis.Object.create((this.messagePrototype!));
+        message.id = "";
+        message.createdAt = "";
         message.firstName = "";
         message.middleName = "";
         message.lastName = "";
@@ -406,19 +513,25 @@ class User$Type extends MessageType<User> {
         while (reader.pos < end) {
             let [fieldNo, wireType] = reader.tag();
             switch (fieldNo) {
-                case /* string firstName */ 1:
+                case /* string id */ 1:
+                    message.id = reader.string();
+                    break;
+                case /* string createdAt */ 2:
+                    message.createdAt = reader.string();
+                    break;
+                case /* string firstName */ 3:
                     message.firstName = reader.string();
                     break;
-                case /* string middleName */ 2:
+                case /* string middleName */ 4:
                     message.middleName = reader.string();
                     break;
-                case /* string lastName */ 3:
+                case /* string lastName */ 5:
                     message.lastName = reader.string();
                     break;
-                case /* float latitude */ 4:
+                case /* float latitude */ 6:
                     message.latitude = reader.float();
                     break;
-                case /* float longitude */ 5:
+                case /* float longitude */ 7:
                     message.longitude = reader.float();
                     break;
                 default:
@@ -433,21 +546,27 @@ class User$Type extends MessageType<User> {
         return message;
     }
     internalBinaryWrite(message: User, writer: IBinaryWriter, options: BinaryWriteOptions): IBinaryWriter {
-        /* string firstName = 1; */
+        /* string id = 1; */
+        if (message.id !== "")
+            writer.tag(1, WireType.LengthDelimited).string(message.id);
+        /* string createdAt = 2; */
+        if (message.createdAt !== "")
+            writer.tag(2, WireType.LengthDelimited).string(message.createdAt);
+        /* string firstName = 3; */
         if (message.firstName !== "")
-            writer.tag(1, WireType.LengthDelimited).string(message.firstName);
-        /* string middleName = 2; */
+            writer.tag(3, WireType.LengthDelimited).string(message.firstName);
+        /* string middleName = 4; */
         if (message.middleName !== "")
-            writer.tag(2, WireType.LengthDelimited).string(message.middleName);
-        /* string lastName = 3; */
+            writer.tag(4, WireType.LengthDelimited).string(message.middleName);
+        /* string lastName = 5; */
         if (message.lastName !== "")
-            writer.tag(3, WireType.LengthDelimited).string(message.lastName);
-        /* float latitude = 4; */
+            writer.tag(5, WireType.LengthDelimited).string(message.lastName);
+        /* float latitude = 6; */
         if (message.latitude !== 0)
-            writer.tag(4, WireType.Bit32).float(message.latitude);
-        /* float longitude = 5; */
+            writer.tag(6, WireType.Bit32).float(message.latitude);
+        /* float longitude = 7; */
         if (message.longitude !== 0)
-            writer.tag(5, WireType.Bit32).float(message.longitude);
+            writer.tag(7, WireType.Bit32).float(message.longitude);
         let u = options.writeUnknownFields;
         if (u !== false)
             (u == true ? UnknownFieldHandler.onWrite : u)(this.typeName, message, writer);
@@ -458,6 +577,283 @@ class User$Type extends MessageType<User> {
  * @generated MessageType for protobuf message User
  */
 export const User = new User$Type();
+// @generated message type with reflection information, may provide speed optimized methods
+class Auth$Type extends MessageType<Auth> {
+    constructor() {
+        super("Auth", [
+            { no: 1, name: "id", kind: "scalar", T: 9 /*ScalarType.STRING*/ },
+            { no: 2, name: "createdAt", kind: "scalar", T: 9 /*ScalarType.STRING*/ },
+            { no: 3, name: "email", kind: "scalar", T: 9 /*ScalarType.STRING*/ },
+            { no: 7, name: "phone", kind: "scalar", T: 9 /*ScalarType.STRING*/ },
+            { no: 4, name: "isEmailVerified", kind: "scalar", T: 9 /*ScalarType.STRING*/ },
+            { no: 5, name: "role", kind: "enum", T: () => ["Role", Role] },
+            { no: 6, name: "status", kind: "enum", T: () => ["AuthStatus", AuthStatus] }
+        ]);
+    }
+    create(value?: PartialMessage<Auth>): Auth {
+        const message = globalThis.Object.create((this.messagePrototype!));
+        message.id = "";
+        message.createdAt = "";
+        message.email = "";
+        message.phone = "";
+        message.isEmailVerified = "";
+        message.role = 0;
+        message.status = 0;
+        if (value !== undefined)
+            reflectionMergePartial<Auth>(this, message, value);
+        return message;
+    }
+    internalBinaryRead(reader: IBinaryReader, length: number, options: BinaryReadOptions, target?: Auth): Auth {
+        let message = target ?? this.create(), end = reader.pos + length;
+        while (reader.pos < end) {
+            let [fieldNo, wireType] = reader.tag();
+            switch (fieldNo) {
+                case /* string id */ 1:
+                    message.id = reader.string();
+                    break;
+                case /* string createdAt */ 2:
+                    message.createdAt = reader.string();
+                    break;
+                case /* string email */ 3:
+                    message.email = reader.string();
+                    break;
+                case /* string phone */ 7:
+                    message.phone = reader.string();
+                    break;
+                case /* string isEmailVerified */ 4:
+                    message.isEmailVerified = reader.string();
+                    break;
+                case /* Role role */ 5:
+                    message.role = reader.int32();
+                    break;
+                case /* AuthStatus status */ 6:
+                    message.status = reader.int32();
+                    break;
+                default:
+                    let u = options.readUnknownField;
+                    if (u === "throw")
+                        throw new globalThis.Error(`Unknown field ${fieldNo} (wire type ${wireType}) for ${this.typeName}`);
+                    let d = reader.skip(wireType);
+                    if (u !== false)
+                        (u === true ? UnknownFieldHandler.onRead : u)(this.typeName, message, fieldNo, wireType, d);
+            }
+        }
+        return message;
+    }
+    internalBinaryWrite(message: Auth, writer: IBinaryWriter, options: BinaryWriteOptions): IBinaryWriter {
+        /* string id = 1; */
+        if (message.id !== "")
+            writer.tag(1, WireType.LengthDelimited).string(message.id);
+        /* string createdAt = 2; */
+        if (message.createdAt !== "")
+            writer.tag(2, WireType.LengthDelimited).string(message.createdAt);
+        /* string email = 3; */
+        if (message.email !== "")
+            writer.tag(3, WireType.LengthDelimited).string(message.email);
+        /* string isEmailVerified = 4; */
+        if (message.isEmailVerified !== "")
+            writer.tag(4, WireType.LengthDelimited).string(message.isEmailVerified);
+        /* Role role = 5; */
+        if (message.role !== 0)
+            writer.tag(5, WireType.Varint).int32(message.role);
+        /* AuthStatus status = 6; */
+        if (message.status !== 0)
+            writer.tag(6, WireType.Varint).int32(message.status);
+        /* string phone = 7; */
+        if (message.phone !== "")
+            writer.tag(7, WireType.LengthDelimited).string(message.phone);
+        let u = options.writeUnknownFields;
+        if (u !== false)
+            (u == true ? UnknownFieldHandler.onWrite : u)(this.typeName, message, writer);
+        return writer;
+    }
+}
+/**
+ * @generated MessageType for protobuf message Auth
+ */
+export const Auth = new Auth$Type();
+// @generated message type with reflection information, may provide speed optimized methods
+class AuthStatusHistory$Type extends MessageType<AuthStatusHistory> {
+    constructor() {
+        super("AuthStatusHistory", [
+            { no: 1, name: "id", kind: "scalar", T: 9 /*ScalarType.STRING*/ },
+            { no: 2, name: "createdAt", kind: "scalar", T: 9 /*ScalarType.STRING*/ },
+            { no: 3, name: "status", kind: "enum", T: () => ["AuthStatus", AuthStatus] }
+        ]);
+    }
+    create(value?: PartialMessage<AuthStatusHistory>): AuthStatusHistory {
+        const message = globalThis.Object.create((this.messagePrototype!));
+        message.id = "";
+        message.createdAt = "";
+        message.status = 0;
+        if (value !== undefined)
+            reflectionMergePartial<AuthStatusHistory>(this, message, value);
+        return message;
+    }
+    internalBinaryRead(reader: IBinaryReader, length: number, options: BinaryReadOptions, target?: AuthStatusHistory): AuthStatusHistory {
+        let message = target ?? this.create(), end = reader.pos + length;
+        while (reader.pos < end) {
+            let [fieldNo, wireType] = reader.tag();
+            switch (fieldNo) {
+                case /* string id */ 1:
+                    message.id = reader.string();
+                    break;
+                case /* string createdAt */ 2:
+                    message.createdAt = reader.string();
+                    break;
+                case /* AuthStatus status */ 3:
+                    message.status = reader.int32();
+                    break;
+                default:
+                    let u = options.readUnknownField;
+                    if (u === "throw")
+                        throw new globalThis.Error(`Unknown field ${fieldNo} (wire type ${wireType}) for ${this.typeName}`);
+                    let d = reader.skip(wireType);
+                    if (u !== false)
+                        (u === true ? UnknownFieldHandler.onRead : u)(this.typeName, message, fieldNo, wireType, d);
+            }
+        }
+        return message;
+    }
+    internalBinaryWrite(message: AuthStatusHistory, writer: IBinaryWriter, options: BinaryWriteOptions): IBinaryWriter {
+        /* string id = 1; */
+        if (message.id !== "")
+            writer.tag(1, WireType.LengthDelimited).string(message.id);
+        /* string createdAt = 2; */
+        if (message.createdAt !== "")
+            writer.tag(2, WireType.LengthDelimited).string(message.createdAt);
+        /* AuthStatus status = 3; */
+        if (message.status !== 0)
+            writer.tag(3, WireType.Varint).int32(message.status);
+        let u = options.writeUnknownFields;
+        if (u !== false)
+            (u == true ? UnknownFieldHandler.onWrite : u)(this.typeName, message, writer);
+        return writer;
+    }
+}
+/**
+ * @generated MessageType for protobuf message AuthStatusHistory
+ */
+export const AuthStatusHistory = new AuthStatusHistory$Type();
+// @generated message type with reflection information, may provide speed optimized methods
+class AuthDetail$Type extends MessageType<AuthDetail> {
+    constructor() {
+        super("AuthDetail", [
+            { no: 1, name: "id", kind: "scalar", T: 9 /*ScalarType.STRING*/ },
+            { no: 2, name: "createdAt", kind: "scalar", T: 9 /*ScalarType.STRING*/ },
+            { no: 3, name: "email", kind: "scalar", T: 9 /*ScalarType.STRING*/ },
+            { no: 4, name: "phone", kind: "scalar", T: 9 /*ScalarType.STRING*/ },
+            { no: 5, name: "isEmailVerified", kind: "scalar", T: 9 /*ScalarType.STRING*/ },
+            { no: 6, name: "role", kind: "enum", T: () => ["Role", Role] },
+            { no: 7, name: "status", kind: "enum", T: () => ["AuthStatus", AuthStatus] },
+            { no: 8, name: "history", kind: "message", repeat: 2 /*RepeatType.UNPACKED*/, T: () => AuthStatusHistory },
+            { no: 9, name: "emailVerificationToken", kind: "scalar", T: 9 /*ScalarType.STRING*/ },
+            { no: 10, name: "emailVerificationPublishAt", kind: "scalar", T: 9 /*ScalarType.STRING*/ }
+        ]);
+    }
+    create(value?: PartialMessage<AuthDetail>): AuthDetail {
+        const message = globalThis.Object.create((this.messagePrototype!));
+        message.id = "";
+        message.createdAt = "";
+        message.email = "";
+        message.phone = "";
+        message.isEmailVerified = "";
+        message.role = 0;
+        message.status = 0;
+        message.history = [];
+        message.emailVerificationToken = "";
+        message.emailVerificationPublishAt = "";
+        if (value !== undefined)
+            reflectionMergePartial<AuthDetail>(this, message, value);
+        return message;
+    }
+    internalBinaryRead(reader: IBinaryReader, length: number, options: BinaryReadOptions, target?: AuthDetail): AuthDetail {
+        let message = target ?? this.create(), end = reader.pos + length;
+        while (reader.pos < end) {
+            let [fieldNo, wireType] = reader.tag();
+            switch (fieldNo) {
+                case /* string id */ 1:
+                    message.id = reader.string();
+                    break;
+                case /* string createdAt */ 2:
+                    message.createdAt = reader.string();
+                    break;
+                case /* string email */ 3:
+                    message.email = reader.string();
+                    break;
+                case /* string phone */ 4:
+                    message.phone = reader.string();
+                    break;
+                case /* string isEmailVerified */ 5:
+                    message.isEmailVerified = reader.string();
+                    break;
+                case /* Role role */ 6:
+                    message.role = reader.int32();
+                    break;
+                case /* AuthStatus status */ 7:
+                    message.status = reader.int32();
+                    break;
+                case /* repeated AuthStatusHistory history */ 8:
+                    message.history.push(AuthStatusHistory.internalBinaryRead(reader, reader.uint32(), options));
+                    break;
+                case /* string emailVerificationToken */ 9:
+                    message.emailVerificationToken = reader.string();
+                    break;
+                case /* string emailVerificationPublishAt */ 10:
+                    message.emailVerificationPublishAt = reader.string();
+                    break;
+                default:
+                    let u = options.readUnknownField;
+                    if (u === "throw")
+                        throw new globalThis.Error(`Unknown field ${fieldNo} (wire type ${wireType}) for ${this.typeName}`);
+                    let d = reader.skip(wireType);
+                    if (u !== false)
+                        (u === true ? UnknownFieldHandler.onRead : u)(this.typeName, message, fieldNo, wireType, d);
+            }
+        }
+        return message;
+    }
+    internalBinaryWrite(message: AuthDetail, writer: IBinaryWriter, options: BinaryWriteOptions): IBinaryWriter {
+        /* string id = 1; */
+        if (message.id !== "")
+            writer.tag(1, WireType.LengthDelimited).string(message.id);
+        /* string createdAt = 2; */
+        if (message.createdAt !== "")
+            writer.tag(2, WireType.LengthDelimited).string(message.createdAt);
+        /* string email = 3; */
+        if (message.email !== "")
+            writer.tag(3, WireType.LengthDelimited).string(message.email);
+        /* string phone = 4; */
+        if (message.phone !== "")
+            writer.tag(4, WireType.LengthDelimited).string(message.phone);
+        /* string isEmailVerified = 5; */
+        if (message.isEmailVerified !== "")
+            writer.tag(5, WireType.LengthDelimited).string(message.isEmailVerified);
+        /* Role role = 6; */
+        if (message.role !== 0)
+            writer.tag(6, WireType.Varint).int32(message.role);
+        /* AuthStatus status = 7; */
+        if (message.status !== 0)
+            writer.tag(7, WireType.Varint).int32(message.status);
+        /* repeated AuthStatusHistory history = 8; */
+        for (let i = 0; i < message.history.length; i++)
+            AuthStatusHistory.internalBinaryWrite(message.history[i], writer.tag(8, WireType.LengthDelimited).fork(), options).join();
+        /* string emailVerificationToken = 9; */
+        if (message.emailVerificationToken !== "")
+            writer.tag(9, WireType.LengthDelimited).string(message.emailVerificationToken);
+        /* string emailVerificationPublishAt = 10; */
+        if (message.emailVerificationPublishAt !== "")
+            writer.tag(10, WireType.LengthDelimited).string(message.emailVerificationPublishAt);
+        let u = options.writeUnknownFields;
+        if (u !== false)
+            (u == true ? UnknownFieldHandler.onWrite : u)(this.typeName, message, writer);
+        return writer;
+    }
+}
+/**
+ * @generated MessageType for protobuf message AuthDetail
+ */
+export const AuthDetail = new AuthDetail$Type();
 // @generated message type with reflection information, may provide speed optimized methods
 class Pagination$Type extends MessageType<Pagination> {
     constructor() {

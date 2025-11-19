@@ -281,6 +281,15 @@ export interface MyInfoResponse {
      */
     data?: MyInfoData;
 }
+/**
+ * @generated from protobuf message VerifyEmailRequest
+ */
+export interface VerifyEmailRequest {
+    /**
+     * @generated from protobuf field: string token = 1
+     */
+    token: string;
+}
 // @generated message type with reflection information, may provide speed optimized methods
 class RegisterAdminRequest$Type extends MessageType<RegisterAdminRequest> {
     constructor() {
@@ -1151,6 +1160,53 @@ class MyInfoResponse$Type extends MessageType<MyInfoResponse> {
  * @generated MessageType for protobuf message MyInfoResponse
  */
 export const MyInfoResponse = new MyInfoResponse$Type();
+// @generated message type with reflection information, may provide speed optimized methods
+class VerifyEmailRequest$Type extends MessageType<VerifyEmailRequest> {
+    constructor() {
+        super("VerifyEmailRequest", [
+            { no: 1, name: "token", kind: "scalar", T: 9 /*ScalarType.STRING*/ }
+        ]);
+    }
+    create(value?: PartialMessage<VerifyEmailRequest>): VerifyEmailRequest {
+        const message = globalThis.Object.create((this.messagePrototype!));
+        message.token = "";
+        if (value !== undefined)
+            reflectionMergePartial<VerifyEmailRequest>(this, message, value);
+        return message;
+    }
+    internalBinaryRead(reader: IBinaryReader, length: number, options: BinaryReadOptions, target?: VerifyEmailRequest): VerifyEmailRequest {
+        let message = target ?? this.create(), end = reader.pos + length;
+        while (reader.pos < end) {
+            let [fieldNo, wireType] = reader.tag();
+            switch (fieldNo) {
+                case /* string token */ 1:
+                    message.token = reader.string();
+                    break;
+                default:
+                    let u = options.readUnknownField;
+                    if (u === "throw")
+                        throw new globalThis.Error(`Unknown field ${fieldNo} (wire type ${wireType}) for ${this.typeName}`);
+                    let d = reader.skip(wireType);
+                    if (u !== false)
+                        (u === true ? UnknownFieldHandler.onRead : u)(this.typeName, message, fieldNo, wireType, d);
+            }
+        }
+        return message;
+    }
+    internalBinaryWrite(message: VerifyEmailRequest, writer: IBinaryWriter, options: BinaryWriteOptions): IBinaryWriter {
+        /* string token = 1; */
+        if (message.token !== "")
+            writer.tag(1, WireType.LengthDelimited).string(message.token);
+        let u = options.writeUnknownFields;
+        if (u !== false)
+            (u == true ? UnknownFieldHandler.onWrite : u)(this.typeName, message, writer);
+        return writer;
+    }
+}
+/**
+ * @generated MessageType for protobuf message VerifyEmailRequest
+ */
+export const VerifyEmailRequest = new VerifyEmailRequest$Type();
 /**
  * @generated ServiceType for protobuf service AuthService
  */
@@ -1162,5 +1218,6 @@ export const AuthService = new ServiceType("AuthService", [
     { name: "RegisterAdmin", options: {}, I: RegisterAdminRequest, O: CommonResponse },
     { name: "UpdateAuthStatus", options: {}, I: UpdateAuthStatusRequest, O: CommonResponse },
     { name: "MyInfo", options: {}, I: EmptyRequest, O: MyInfoResponse },
-    { name: "Logout", options: {}, I: LogoutRequest, O: CommonResponse }
+    { name: "Logout", options: {}, I: LogoutRequest, O: CommonResponse },
+    { name: "VerifyEmail", options: {}, I: VerifyEmailRequest, O: CommonResponse }
 ]);

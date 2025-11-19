@@ -4,6 +4,7 @@
 import type { RpcTransport } from "@protobuf-ts/runtime-rpc";
 import type { ServiceInfo } from "@protobuf-ts/runtime-rpc";
 import { AuthService } from "./exposed-auth";
+import type { VerifyEmailRequest } from "./exposed-auth";
 import type { LogoutRequest } from "./exposed-auth";
 import type { MyInfoResponse } from "./exposed-auth";
 import type { EmptyRequest } from "./exposed-common";
@@ -55,6 +56,10 @@ export interface IAuthServiceClient {
      * @generated from protobuf rpc: Logout
      */
     logout(input: LogoutRequest, options?: RpcOptions): UnaryCall<LogoutRequest, CommonResponse>;
+    /**
+     * @generated from protobuf rpc: VerifyEmail
+     */
+    verifyEmail(input: VerifyEmailRequest, options?: RpcOptions): UnaryCall<VerifyEmailRequest, CommonResponse>;
 }
 /**
  * @generated from protobuf service AuthService
@@ -120,5 +125,12 @@ export class AuthServiceClient implements IAuthServiceClient, ServiceInfo {
     logout(input: LogoutRequest, options?: RpcOptions): UnaryCall<LogoutRequest, CommonResponse> {
         const method = this.methods[7], opt = this._transport.mergeOptions(options);
         return stackIntercept<LogoutRequest, CommonResponse>("unary", this._transport, method, opt, input);
+    }
+    /**
+     * @generated from protobuf rpc: VerifyEmail
+     */
+    verifyEmail(input: VerifyEmailRequest, options?: RpcOptions): UnaryCall<VerifyEmailRequest, CommonResponse> {
+        const method = this.methods[8], opt = this._transport.mergeOptions(options);
+        return stackIntercept<VerifyEmailRequest, CommonResponse>("unary", this._transport, method, opt, input);
     }
 }
