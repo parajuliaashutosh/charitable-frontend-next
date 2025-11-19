@@ -45,6 +45,7 @@ function DonationImage({ imageUrl, title, type }: { imageUrl?: string | null; ti
           fill
           className="object-cover"
           sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+          unoptimized={true}
         />
       </div>
     );
@@ -69,10 +70,10 @@ export function DonationCard({ donation,
   });
 
   const donationTypeLabel = donation.type === 'EDUCATIONAL' ? 'Educational' : 'Clothing';
-
+  console.log(donation?.url, "donation image url");
   return (
     <Card className="hover:shadow-lg transition-all duration-200 overflow-hidden pt-0">
-      <DonationImage imageUrl={donation.imageUrl} title={donation.title} type={donation.type} />
+      <DonationImage imageUrl={donation.url} title={donation.title} type={donation.type} />
       
       <CardHeader>
         <div className="flex items-start justify-between">

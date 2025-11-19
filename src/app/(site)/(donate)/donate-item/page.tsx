@@ -1,6 +1,7 @@
 "use client";
 
 import { MapPicker } from "@/components/common/map-picker/map-picker";
+import MediaUpload from "@/components/common/media-upload/media-upload";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
 import {
@@ -20,6 +21,10 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
+import { MediaType } from "@/constants/media.enum";
+import useMedia from "@/hooks/useMedia";
+import { logger } from "@/lib/logger";
+import { mediaUploadFn } from "@/lib/uploadMedia";
 import { donationServiceClient } from "@/transport/gateway/gRPC/requests/donation/donation-requests";
 import { DonationType } from "@/transport/gateway/gRPC/stubs/exposed-common";
 import { UserDonationRequest } from "@/transport/gateway/gRPC/stubs/exposed-donation";
@@ -30,32 +35,26 @@ import { useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { toast } from "sonner";
 
-// Mock user data
-const CURRENT_USER = {
-  name: "John Doe",
-  email: "john@example.com",
-};
-
 const DONATION_TYPES = [
   {
-    value: "Educational",
+    value: DonationType.BOOKS,
     label: "Educational Materials (Books, Supplies, etc.)",
   },
-  { value: "Clothing", label: "Clothing & Accessories" },
+  { value: DonationType.CLOTHES, label: "Clothing & Accessories" },
 ];
 
 interface DonationFormData {
   title: string;
   description: string;
   type: string;
-  productUrl: string;
   lat: number;
   lng: number;
 }
 
 export default function DonateItemPage() {
   const router = useRouter();
-  const [loading, setLoading] = useState(false);
+  const [media, setMedia] = useMedia();
+
   const [error, setError] = useState("");
   const [showMapPicker, setShowMapPicker] = useState(false);
 
@@ -71,7 +70,6 @@ export default function DonateItemPage() {
       title: "",
       description: "",
       type: "",
-      productUrl: "",
       lat: 0,
       lng: 0,
     },
@@ -96,14 +94,18 @@ export default function DonateItemPage() {
       return;
     }
 
-    setLoading(true);
-
     try {
+      const mediaResponse = await mediaUploadFn(
+        media?.selectedFiles,
+        MediaType?.donations
+      );
+
+      logger.log("Media response check", mediaResponse);
       const payload: UserDonationRequest = {
         title: data.title,
         description: data.description,
-        type: DonationType.BOOKS,
-        productUrl: data.productUrl || "",
+        type: data.type as unknown as DonationType,
+        productUrl: mediaResponse,
         lat: data.lat,
         long: data.lng,
       };
@@ -115,21 +117,22 @@ export default function DonateItemPage() {
 
       router.push("/donate");
       toast.success("Action Successful", {
-        description: resp?.message || "Your donation has been created successfully.",
+        description:
+          resp?.message || "Your donation has been created successfully.",
       });
     } catch (err: any) {
       setError("Failed to create donation. Please try again.");
-      setLoading(false);
       toast.error("Action Failed", {
-        description: err?.message || "An error occurred while creating your donation.",
+        description:
+          err?.message || "An error occurred while creating your donation.",
       });
     }
   };
 
-  const handleFormSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    handleSubmit(onSubmit)(e);
-  };
+  // const handleFormSubmit = (e: React.FormEvent) => {
+  //   e.preventDefault();
+  //   handleSubmit(onSubmit)(e);
+  // };
 
   return (
     <main className="max-w-2xl mx-auto px-4 py-8 hide-scrollbar max-h-[90vh] overflow-y-auto">
@@ -175,7 +178,7 @@ export default function DonateItemPage() {
                       </SelectTrigger>
                       <SelectContent className="w-full">
                         {DONATION_TYPES.map((type) => (
-                          <SelectItem key={type.value} value={type.value}>
+                          <SelectItem key={type.value} value={type.value as unknown as string}>
                             {type.label}
                           </SelectItem>
                         ))}
@@ -222,7 +225,7 @@ export default function DonateItemPage() {
             </div>
 
             {/* Product URL (Optional) */}
-            <div className="space-y-2">
+            {/* <div className="space-y-2">
               <FormLabel>Product Link (Optional)</FormLabel>
               <Input
                 id="productUrl"
@@ -230,7 +233,7 @@ export default function DonateItemPage() {
                 placeholder="Link to product details or image"
                 {...register("productUrl")}
               />
-            </div>
+            </div> */}
 
             {/* Location Picker */}
             <div className="space-y-2">
@@ -281,15 +284,24 @@ export default function DonateItemPage() {
               )}
             </div>
 
+            <MediaUpload
+              setAppState={setMedia}
+              appState={media}
+              title="Upload Item Image"
+              accept={["images"]}
+              isRequired={false}
+              hideUpload={false}
+            />
+
             {/* Submit Buttons */}
             <div className="flex gap-3 pt-4">
               <Button
                 type="button"
                 onClick={handleSubmit(onSubmit)}
-                disabled={loading}
+                disabled={isSubmitting}
                 className="flex-1 bg-primary hover:bg-primary-dark"
               >
-                {loading ? "Creating..." : "Create Donation"}
+                {isSubmitting ? "Creating..." : "Create Donation"}
               </Button>
               <Link href="/donate" className="flex-1">
                 <Button type="button" variant="outline" className="w-full">
