@@ -2,6 +2,7 @@
 
 import { MapPicker } from "@/components/common/map-picker/map-picker";
 import MediaUpload from "@/components/common/media-upload/media-upload";
+import GenericSelect from "@/components/common/select/generic-select";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
 import {
@@ -186,10 +187,23 @@ export default function DonateItemPage() {
                     </Select>
                   )}
                 />
+
                 <p className="text-sm text-destructive">
                   {errors?.type?.message}
                 </p>
-              </div>
+
+                <GenericSelect 
+                  label="What are you donating?"
+                  placeholder="Select donation type"
+                  value={selectedType}
+                  handleChange={(val) => setValue("type", val as string)}
+                  options={DONATION_TYPES.map((type) => ({
+                    label: type.label,
+                    value: type.value as unknown as string,
+                  }))}
+                  error={errors?.type}
+                />
+              </div>message
 
               {/* Title */}
               <div className="space-y-2">
