@@ -29,5 +29,6 @@ declare module 'next-auth/jwt' {
     role: AuthRole
     accessToken?: string
     refreshToken?: string
+    expiresAt: number
   }
 }

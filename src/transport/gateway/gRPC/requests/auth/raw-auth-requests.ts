@@ -4,6 +4,7 @@ import {
   LoginRequest,
   LoginResponse,
   MyInfoResponse,
+  RefreshTokenRequest,
 } from "../../stubs/exposed-auth";
 import { EmptyRequest } from "../../stubs/exposed-common";
 
@@ -28,9 +29,17 @@ const myInfo = async (
   return await call.response;
 };
 
+const refreshToken = async (
+  request: RefreshTokenRequest,
+  options?: RpcOptions
+): Promise<LoginResponse> => {
+  const call = serviceClients.authServiceClient.refreshToken(request, options);
+  return await call.response;
+};
 const rawAuthServiceRequests = {
   login,
   myInfo,
+  refreshToken
 };
 
 export default rawAuthServiceRequests;

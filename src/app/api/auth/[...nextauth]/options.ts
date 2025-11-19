@@ -4,6 +4,9 @@ import rawAuthServiceRequests from "@/transport/gateway/gRPC/requests/auth/raw-a
 import { NextAuthOptions, User } from "next-auth";
 import Credentials from "next-auth/providers/credentials";
 
+const getRefreshTokenAfter = (minutes: number = 14) => {
+  return Date.now() + minutes * 60 * 1000;
+}
 export const options: NextAuthOptions = {
   providers: [
     Credentials({
@@ -12,9 +15,7 @@ export const options: NextAuthOptions = {
         username: { label: "Username", type: "text", placeholder: "john" },
         password: { label: "Password", type: "password" },
       },
-      async authorize(
-        credentials: Record<"username" | "password", string>,
-      ) {
+      async authorize(credentials: Record<"username" | "password", string>) {
         try {
           const res = await rawAuthServiceRequests.login(
             {
@@ -58,6 +59,25 @@ export const options: NextAuthOptions = {
         token.role = user.role;
         token.accessToken = user.accessToken;
         token.refreshToken = user.refreshToken;
+        token.expiresAt = getRefreshTokenAfter();
+      }
+
+      if (Date.now() < token.expiresAt) {
+        return token;
+      }
+
+      // Token expired → refresh
+      try {
+        const refreshed = await rawAuthServiceRequests.refreshToken({
+          refreshToken: token.refreshToken,
+        });
+
+        token.accessToken = refreshed.data.accessToken;
+        token.refreshToken = refreshed.data.refreshToken;
+        token.expiresAt = getRefreshTokenAfter();
+      } catch (err) {
+        console.error("Refresh token failed:", err);
+        return token;
       }
       return token;
     },
