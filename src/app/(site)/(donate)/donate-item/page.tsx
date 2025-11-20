@@ -46,7 +46,7 @@ interface DonationFormData {
 export default function DonateItemPage() {
   const router = useRouter();
   const [media, setMedia] = useMedia();
-  const {coords, error: geoError} = useGeolocation();
+  const { coords, error: geoError } = useGeolocation();
 
   const [error, setError] = useState("");
   const [showMapPicker, setShowMapPicker] = useState(false);
@@ -78,15 +78,15 @@ export default function DonateItemPage() {
   };
 
   const onSubmit = async (data: DonationFormData) => {
-    setError("");
-
-    // Validate location
-    if (!data.lat || !data.lng) {
-      setError("Please select a location on the map");
-      return;
-    }
-
     try {
+      setError("");
+
+      // Validate location
+      if (!data.lat || !data.lng) {
+        setError("Please select a location on the map");
+        return;
+      }
+
       const mediaResponse = await mediaUploadFn(
         media?.selectedFiles,
         MediaType?.donations
@@ -118,6 +118,7 @@ export default function DonateItemPage() {
         description:
           err?.message || "An error occurred while creating your donation.",
       });
+      return;
     }
   };
 

@@ -1,34 +1,25 @@
 "use client";
 
+import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { DonationType } from '@/transport/gateway/gRPC/stubs/exposed-common';
+import { DonationItems } from '@/transport/gateway/gRPC/stubs/exposed-donation';
 import { BookOpen, Package, Shirt } from 'lucide-react';
 import Image from 'next/image';
 import StatusBadge from '../badge/status-badge';
 
-type DonationType = 'EDUCATIONAL' | 'CLOTHING';
-type DonationStatus = 'PENDING' | 'APPROVED' | 'REJECTED' | 'COMPLETED';
 
 interface DonationCardProps {
-  donation: {
-    id: string;
-    title: string;
-    description: string;
-    type: DonationType;
-    status: DonationStatus;
-    imageUrl?: string | null;
-    createdAt: string | Date;
-  };
-  onEdit?: (id: string) => void;
-  onRemove?: (id: string) => void;
+  donation: DonationItems
 }
 
-function DonationTypeIcon({ type }: { type: DonationType }) {
+function DonationTypeIcon({ type }: { type:  DonationType}) {
   const iconClass = "w-5 h-5";
   
   switch (type) {
-    case 'EDUCATIONAL':
+    case DonationType.BOOKS:
       return <BookOpen className={`${iconClass} text-primary`} />;
-    case 'CLOTHING':
+    case DonationType.CLOTHES:
       return <Shirt className={`${iconClass} text-accent`} />;
     default:
       return <Package className={`${iconClass} text-muted-foreground`} />;
@@ -52,7 +43,7 @@ function DonationImage({ imageUrl, title, type }: { imageUrl?: string | null; ti
   }
 
   // Fallback illustration
-  const IconComponent = type === 'EDUCATIONAL' ? BookOpen : Shirt;
+  const IconComponent = type === DonationType.BOOKS ? BookOpen : Shirt;
   
   return (
     <div className="relative w-full h-48 rounded-t-lg overflow-hidden bg-linear-to-br from-muted to-muted/50 flex items-center justify-center">
@@ -61,16 +52,19 @@ function DonationImage({ imageUrl, title, type }: { imageUrl?: string | null; ti
   );
 }
 
-export function DonationCard({ donation, 
-    onEdit, onRemove }: DonationCardProps) {
+export function DonationCard({ donation }: DonationCardProps) {
   const formattedDate = new Date(donation.createdAt).toLocaleDateString('en-US', {
     year: 'numeric',
     month: 'short',
     day: 'numeric',
   });
 
-  const donationTypeLabel = donation.type === 'EDUCATIONAL' ? 'Educational' : 'Clothing';
-  console.log(donation?.url, "donation image url");
+  const donationTypeLabel = donation.type === DonationType.BOOKS ? 'Educational' : 'Clothing';
+  
+  const claimDonation = (id: string) => {
+    // Implement claim logic here
+    console.log(`Claiming donation with ID: ${donation.id}`);
+  }
   return (
     <Card className="hover:shadow-lg transition-all duration-200 overflow-hidden pt-0">
       <DonationImage imageUrl={donation.url} title={donation.title} type={donation.type} />
@@ -94,25 +88,26 @@ export function DonationCard({ donation,
         <div className="text-xs text-muted-foreground">
           Posted: {formattedDate}
         </div>
-        
-        {/* <div className="flex gap-2">
-          <Button 
+
+          {/* <Button 
             variant="outline" 
             size="sm" 
             className="flex-1"
             onClick={() => onEdit?.(donation.id)}
           >
             Edit
-          </Button>
+          </Button> */}
+        
+        <div className="flex gap-2">
           <Button 
             variant="ghost" 
             size="sm" 
             className="flex-1 text-destructive hover:text-destructive"
-            onClick={() => onRemove?.(donation.id)}
+            onClick={() => claimDonation(donation.id)}
           >
-            Remove
+            Claim
           </Button>
-        </div> */}
+        </div>
       </CardContent>
     </Card>
   );
