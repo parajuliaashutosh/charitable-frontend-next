@@ -1,153 +1,176 @@
-import { Input } from '@/components/ui/input'
-import { IMedia } from '@/interface/media.interface'
+import { IMedia } from "@/interface/media.interface";
 
-import React from 'react'
-import ImageRenderer from './image-renderer'
+import React from "react";
+import ImageRenderer from "./image-renderer";
 
-type acceptExtension = 'images' | 'pdf' | 'xlsx' | 'svg'
+type acceptExtension = "images" | "pdf" | "xlsx" | "svg";
 
 export interface AppState {
-    selectedFiles: File[]
-    mediaGroup: IMedia[]
-    deleteMedia: IMedia[] | string[]
+  selectedFiles: File[];
+  mediaGroup: IMedia[];
+  deleteMedia: IMedia[] | string[];
 }
 
 interface IProps {
-    title: string
-    hideCross?: boolean
-    hideUpload?: boolean
-    accept?: acceptExtension[]
-    appState: AppState
-    setAppState: React.Dispatch<React.SetStateAction<AppState>>
-    multipleUpload?: boolean
-    isRequired?: boolean
-    requiredMessage?: string
-    showError?: boolean
-    replace?: boolean
+  title: string;
+  hideCross?: boolean;
+  hideUpload?: boolean;
+  accept?: acceptExtension[];
+  appState: AppState;
+  setAppState: React.Dispatch<React.SetStateAction<AppState>>;
+  multipleUpload?: boolean;
+  isRequired?: boolean;
+  requiredMessage?: string;
+  showError?: boolean;
+  replace?: boolean;
 }
 
 const MediaUpload = ({
-    title,
-    hideCross = false,
-    hideUpload = false,
-    accept = ['images'],
-    appState,
-    setAppState,
-    multipleUpload = true,
-    isRequired = false,
-    requiredMessage = '',
-    showError = false,
-    replace = false,
+  title,
+  hideCross = false,
+  hideUpload = false,
+  accept = ["images"],
+  appState,
+  setAppState,
+  multipleUpload = true,
+  isRequired = false,
+  requiredMessage = "",
+  showError = false,
+  replace = false,
 }: IProps) => {
-    const handleDeleteFile = (index: number) => {
-        setAppState((prevState) => ({
-            ...prevState,
-            selectedFiles: prevState.selectedFiles.filter((_item, i) => i !== index),
-        }))
+  const handleDeleteFile = (index: number) => {
+    setAppState((prevState) => ({
+      ...prevState,
+      selectedFiles: prevState.selectedFiles.filter((_item, i) => i !== index),
+    }));
+  };
+
+  const deleteMediaFile = (index: number, media: any) => {
+    setAppState((prevState) => ({
+      ...prevState,
+      mediaGroup: prevState.mediaGroup.filter((_item, i) => i !== index),
+      deleteMedia: [...prevState.deleteMedia, media],
+    }));
+  };
+
+  const supported: string[] = [];
+  if (accept.includes("images"))
+    supported.push("image/png", "image/jpeg", "image/jpg");
+  if (accept.includes("pdf")) supported.push("application/pdf , pdf");
+  if (accept.includes("xlsx")) supported.push(".xlsx");
+
+  const acceptExt: string = supported.join(", ");
+
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const temp = Array.from(e.target.files ?? []);
+
+    if (replace) {
+      // When replace is true, clear existing files and set new ones
+      setAppState((prevState) => ({
+        ...prevState,
+        selectedFiles: temp,
+        mediaGroup: [],
+        // If there are existing mediaGroup items, move them to deleteMedia
+        deleteMedia: [
+          ...(prevState.deleteMedia as IMedia[]),
+          ...prevState.mediaGroup,
+        ],
+      }));
+    } else if (multipleUpload) {
+      setAppState((prevState) => ({
+        ...prevState,
+        selectedFiles: [...prevState.selectedFiles, ...temp],
+      }));
+    } else {
+      setAppState((prevState) => ({
+        ...prevState,
+        selectedFiles: temp,
+      }));
     }
+  };
 
-    const deleteMediaFile = (index: number, media: any) => {
-        setAppState((prevState) => ({
-            ...prevState,
-            mediaGroup: prevState.mediaGroup.filter((_item, i) => i !== index),
-            deleteMedia: [...prevState.deleteMedia, media],
-        }))
-    }
+  return (
+    <div>
+      <div
+        className="flex flex-wrap gap-2"
+        style={{ paddingBottom: appState?.mediaGroup?.length > 0 ? 3 : 0 }}
+      >
+        {appState?.mediaGroup?.map((media: IMedia, index: number) => {
+          return (
+            <React.Fragment key={index}>
+              <ImageRenderer
+                title={title}
+                url={media.path as string}
+                // mimeType={media?.mimeType as string}
+                hideCross={hideCross}
+                handleDeleteFile={() => {
+                  deleteMediaFile(index, media);
+                }}
+              />
+            </React.Fragment>
+          );
+        })}
+      </div>
+      <div
+        style={{ paddingBottom: appState?.mediaGroup?.length > 0 ? 3 : 0 }}
+        className="flex flex-wrap gap-2"
+      >
+        {appState?.selectedFiles?.map((file, index: number) => {
+          return (
+            <React.Fragment key={index}>
+              <ImageRenderer
+                title={title}
+                file={file as File}
+                mimeType={file?.type as string}
+                handleDeleteFile={() => {
+                  handleDeleteFile(index);
+                }}
+              />
+            </React.Fragment>
+          );
+        })}
+      </div>
+      {!hideUpload && (
+        <>
+          <input
+            id="hidden-file-input"
+            type="file"
+            multiple={false}
+            accept={acceptExt}
+            style={{ display: "none" }}
+            onChange={handleFileChange}
+          />
 
-    const supported: string[] = []
-    if (accept.includes('images')) supported.push('image/png', 'image/jpeg', 'image/jpg')
-    if (accept.includes('pdf')) supported.push('application/pdf , pdf')
-    if (accept.includes('xlsx')) supported.push('.xlsx')
+          <div
+            onClick={() =>
+              document.getElementById("hidden-file-input")?.click()
+            }
+            className="w-full cursor-pointer rounded-xl border border-dashed border-primary/40 p-6 text-center hover:bg-primary/5 transition"
+          >
+            <p className="font-medium text-primary">📁 Upload File</p>
+            <p className="text-xs text-gray-500 mt-1">{accept.join(", ")}</p>
+          </div>
 
-    const acceptExt: string = supported.join(', ')
-
-    const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        const temp = Array.from(e.target.files ?? [])
-
-        if (replace) {
-            // When replace is true, clear existing files and set new ones
-            setAppState((prevState) => ({
-                ...prevState,
-                selectedFiles: temp,
-                mediaGroup: [],
-                // If there are existing mediaGroup items, move them to deleteMedia
-                deleteMedia: [...(prevState.deleteMedia as IMedia[]), ...prevState.mediaGroup],
-            }))
-        } else if (multipleUpload) {
-            setAppState((prevState) => ({
-                ...prevState,
-                selectedFiles: [...prevState.selectedFiles, ...temp],
-            }))
-        } else {
-            setAppState((prevState) => ({
-                ...prevState,
-                selectedFiles: temp,
-            }))
-        }
-    }
-
-    return (
-        <div>
-            <div className='flex flex-wrap gap-2' style={{ paddingBottom: appState?.mediaGroup?.length > 0 ? 3 : 0 }}>
-                {appState?.mediaGroup?.map((media: IMedia, index: number) => {
-                    return (
-                        <React.Fragment key={index}>
-                            <ImageRenderer
-                                title={title}
-                                url={media.path as string}
-                                // mimeType={media?.mimeType as string}
-                                hideCross={hideCross}
-                                handleDeleteFile={() => {
-                                    deleteMediaFile(index, media)
-                                }}
-                            />
-                        </React.Fragment>
-                    )
-                })}
+          {isRequired ? (
+            <div className="flex flex-col gap-2">
+              {showError && (
+                <p className="pt-2 text-[13px] text-red-500">
+                  {requiredMessage}
+                </p>
+              )}
+              <p className="pt-2 text-primary text-[13px]">
+                {"Allowed Extensions"}: {accept.join(", ")}
+              </p>
             </div>
-            <div style={{ paddingBottom: appState?.mediaGroup?.length > 0 ? 3 : 0 }} className='flex flex-wrap gap-2'>
-                {appState?.selectedFiles?.map((file, index: number) => {
-                    return (
-                        <React.Fragment key={index}>
-                            <ImageRenderer
-                                title={title}
-                                file={file as File}
-                                mimeType={file?.type as string}
-                                handleDeleteFile={() => {
-                                    handleDeleteFile(index)
-                                }}
-                            />
-                        </React.Fragment>
-                    )
-                })}
-            </div>
-            {!hideUpload && (
-                <>
-                    <Input
-                        label={title}
-                        required={isRequired}
-                        type='file'
-                        placeholder='Enter full name'
-                        multiple={false}
-                        accept={acceptExt}
-                        onChange={handleFileChange}
-                    />
-                    {isRequired ? (
-                        <div className='flex flex-col gap-2'>
-                            {showError && <p className='pt-2 text-[13px] text-red-500'>{requiredMessage}</p>}
-                            <p className='pt-2 text-primary text-[13px]'>
-                                {"Allowed Extensions"}: {accept.join(', ')}
-                            </p>
-                        </div>
-                    ) : (
-                        <p className='pt-2 text-primary text-[13px]'>
-                            {"Allowed Extensions"}: {accept.join(', ')}
-                        </p>
-                    )}
-                </>
-            )}
-        </div>
-    )
-}
+          ) : (
+            <p className="pt-2 text-primary text-[13px]">
+              {"Allowed Extensions"}: {accept.join(", ")}
+            </p>
+          )}
+        </>
+      )}
+    </div>
+  );
+};
 
-export default MediaUpload
+export default MediaUpload;

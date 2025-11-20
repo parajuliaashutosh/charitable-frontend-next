@@ -14,15 +14,9 @@ import {
 } from "@/components/ui/card";
 import { FormError, FormLabel } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
 import { MediaType } from "@/constants/media.enum";
+import { useGeolocation } from "@/hooks/useGeoLocation";
 import useMedia from "@/hooks/useMedia";
 import { logger } from "@/lib/logger";
 import { mediaUploadFn } from "@/lib/uploadMedia";
@@ -32,17 +26,14 @@ import { UserDonationRequest } from "@/transport/gateway/gRPC/stubs/exposed-dona
 import { AlertCircle, ArrowLeft } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
-import { Controller, useForm } from "react-hook-form";
+import { useEffect, useState } from "react";
+import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 
-const DONATION_TYPES = [
-  {
-    value: DonationType.BOOKS,
-    label: "Educational Materials (Books, Supplies, etc.)",
-  },
-  { value: DonationType.CLOTHES, label: "Clothing & Accessories" },
-];
+const DONATION_TYPES = {
+  [DonationType.BOOKS]: "Educational",
+  [DonationType.CLOTHES]: "Clothing",
+};
 
 interface DonationFormData {
   title: string;
@@ -55,6 +46,7 @@ interface DonationFormData {
 export default function DonateItemPage() {
   const router = useRouter();
   const [media, setMedia] = useMedia();
+  const {coords, error: geoError} = useGeolocation();
 
   const [error, setError] = useState("");
   const [showMapPicker, setShowMapPicker] = useState(false);
@@ -62,7 +54,6 @@ export default function DonateItemPage() {
   const {
     register,
     handleSubmit,
-    control,
     setValue,
     watch,
     formState: { isSubmitting, errors },
@@ -105,7 +96,7 @@ export default function DonateItemPage() {
       const payload: UserDonationRequest = {
         title: data.title,
         description: data.description,
-        type: data.type as unknown as DonationType,
+        type: data?.type == "BOOKS" ? DonationType.BOOKS : DonationType.CLOTHES,
         productUrl: mediaResponse,
         lat: data.lat,
         long: data.lng,
@@ -130,10 +121,12 @@ export default function DonateItemPage() {
     }
   };
 
-  // const handleFormSubmit = (e: React.FormEvent) => {
-  //   e.preventDefault();
-  //   handleSubmit(onSubmit)(e);
-  // };
+  useEffect(() => {
+    if (coords) {
+      setValue("lat", coords?.lat);
+      setValue("lng", coords?.lng);
+    }
+  }, [coords, setValue]);
 
   return (
     <main className="max-w-2xl mx-auto px-4 py-8 hide-scrollbar max-h-[90vh] overflow-y-auto">
@@ -166,44 +159,14 @@ export default function DonateItemPage() {
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               {/* Donation Type */}
-              <div className=" w-full">
-                <FormLabel required>What are you donating?</FormLabel>
-                <Controller
-                  name="type"
-                  control={control}
-                  rules={{ required: "Please select a donation type" }}
-                  render={({ field }) => (
-                    <Select value={field.value} onValueChange={field.onChange}>
-                      <SelectTrigger id="type">
-                        <SelectValue placeholder="Select donation type" />
-                      </SelectTrigger>
-                      <SelectContent className="w-full">
-                        {DONATION_TYPES.map((type) => (
-                          <SelectItem key={type.value} value={type.value as unknown as string}>
-                            {type.label}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  )}
-                />
-
-                <p className="text-sm text-destructive">
-                  {errors?.type?.message}
-                </p>
-
-                <GenericSelect 
-                  label="What are you donating?"
-                  placeholder="Select donation type"
-                  value={selectedType}
-                  handleChange={(val) => setValue("type", val as string)}
-                  options={DONATION_TYPES.map((type) => ({
-                    label: type.label,
-                    value: type.value as unknown as string,
-                  }))}
-                  error={errors?.type}
-                />
-              </div>message
+              <GenericSelect
+                label="What are you donating?"
+                placeholder="Select donation type"
+                value={selectedType}
+                handleChange={(val) => setValue("type", val as string)}
+                options={DONATION_TYPES}
+                error={errors?.type}
+              />
 
               {/* Title */}
               <div className="space-y-2">
@@ -297,11 +260,12 @@ export default function DonateItemPage() {
                 />
               )}
             </div>
+            <FormError error={""} />
 
             <MediaUpload
               setAppState={setMedia}
               appState={media}
-              title="Upload Item Image"
+              title="Upload Images of the Item"
               accept={["images"]}
               isRequired={false}
               hideUpload={false}
