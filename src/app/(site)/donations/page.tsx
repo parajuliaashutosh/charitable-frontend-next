@@ -3,16 +3,6 @@ import { Empty } from "@/components/ui/empty";
 import { donationServiceClient } from "@/transport/gateway/gRPC/requests/donation/donation-requests";
 
 export default async function DonationsPage() {
-  // Fetch donations from your gRPC service
-  // const response = await donationServiceRequests.listDonations({
-  //   userId: session.user.id,
-  // }, 3, {
-  //   meta: {
-  //     Authorization: `Bearer ${session.accessToken}`,
-  //   },
-  // });
-
-  // Mock data for demonstration
 
   let donations;
   try {

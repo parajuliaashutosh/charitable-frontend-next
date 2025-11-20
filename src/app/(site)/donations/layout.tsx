@@ -1,3 +1,6 @@
+import Header from "@/components/common/header";
+import UserNavbar from "@/components/common/user-navbar/user-navbar";
+import { getUserSession } from "@/lib/auth";
 import type { Metadata } from "next";
 
 
@@ -22,10 +25,16 @@ export const metadata: Metadata = {
   },
 };
 
-export default function DonateLayout({
+export default async function DonateLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
-  return <div className="min-h-screen bg-background">{children}</div>;
+  const user = await getUserSession();
+
+  return <div className="min-h-screen bg-background">
+    {user?.user?.id ? <UserNavbar /> : <Header />}
+    {children}
+    
+    </div>;
 }

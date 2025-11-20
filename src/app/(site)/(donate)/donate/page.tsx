@@ -9,6 +9,8 @@ import Link from "next/link";
 
 export default async function DonationsPage() {
   let donations;
+  let error;
+  
   try {
     const resp = await donationServiceClient.getMyDonations(
       {
