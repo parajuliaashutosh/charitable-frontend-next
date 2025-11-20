@@ -1,12 +1,14 @@
 "use client";
 
+import { useGeolocation } from "@/hooks/useGeoLocation";
+import { logger } from "@/lib/logger";
 import { organizationRegistrationSchema } from "@/schema/auth.schema";
 import authServiceRequests from "@/transport/gateway/gRPC/requests/auth/auth-requests";
 import { RegisterOrganizationRequest } from "@/transport/gateway/gRPC/stubs/exposed-auth";
 import { yupResolver } from "@hookform/resolvers/yup";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { MapPicker } from "../common/map-picker/map-picker";
@@ -39,6 +41,8 @@ interface IOrganizationRegistrationData {
 
 export default function OrganizationRegisterForm() {
   const router = useRouter();
+  const { coords, error: geoError } = useGeolocation();
+
   const [showMap, setShowMap] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -79,7 +83,7 @@ export default function OrganizationRegisterForm() {
 
   const onSubmit = async (data: IOrganizationRegistrationData) => {
     setError(null);
-   try {
+    try {
       const payload: RegisterOrganizationRequest = {
         organizationName: data.organizationName,
         email: data.email,
@@ -95,7 +99,10 @@ export default function OrganizationRegisterForm() {
         latitude: data.latitude,
         longitude: data.longitude,
       };
-      const response = await authServiceRequests.registerOrganization(payload, 2);
+      const response = await authServiceRequests.registerOrganization(
+        payload,
+        2
+      );
 
       if (!response.success) {
         setError(response.message || "Registration failed");
@@ -118,8 +125,19 @@ export default function OrganizationRegisterForm() {
     }
   };
 
+  useEffect(() => {
+    if (coords) {
+      setValue("latitude", coords?.lat);
+      setValue("longitude", coords?.lng);
+    }
+  }, [coords, setValue]);
+
+  useEffect(() => {
+    logger.log("Geolocation error:", geoError);
+  }, [geoError]);
+
   return (
-    <div className="bg-background py-4 px-4 max-h-[90vh] overflow-y-auto hide-scrollbar">
+    <div className="bg-background py-4 px-0 md:px-4 max-h-[90vh] overflow-y-auto w-full hide-scrollbar">
       <div className="max-w-4xl mx-auto">
         <Card>
           <CardHeader className="text-center">
@@ -230,7 +248,7 @@ export default function OrganizationRegisterForm() {
                       label="Last Name"
                       id="organizationHeadLastName"
                       name="organizationHeadLastName"
-                      {...register("organizationHeadLastName")  }
+                      {...register("organizationHeadLastName")}
                       placeholder="Doe"
                       required
                     />
@@ -271,7 +289,7 @@ export default function OrganizationRegisterForm() {
                       id="password"
                       name="password"
                       type="password"
-                      {...register("password")    }
+                      {...register("password")}
                       placeholder="••••••••"
                       required
                     />
@@ -297,14 +315,24 @@ export default function OrganizationRegisterForm() {
                 {!showMap ? (
                   <div className="border border-border rounded-lg p-4 bg-muted">
                     {latitude === 0 && longitude === 0 ? (
-                      <p className="text-sm text-muted-foreground mb-3">No location selected yet</p>
+                      <p className="text-sm text-muted-foreground mb-3">
+                        No location selected yet
+                      </p>
                     ) : (
                       <p className="text-sm text-muted-foreground mb-3">
-                        Selected: Lat {latitude.toFixed(4)}, Lng {longitude.toFixed(4)}
+                        Selected: Lat {latitude.toFixed(4)}, Lng{" "}
+                        {longitude.toFixed(4)}
                       </p>
                     )}
-                    <Button type="button" variant="outline" onClick={() => setShowMap(true)} className="w-full">
-                      {latitude === 0 ? "Select Location on Map" : "Change Location"}
+                    <Button
+                      type="button"
+                      variant="outline"
+                      onClick={() => setShowMap(true)}
+                      className="w-full"
+                    >
+                      {latitude === 0
+                        ? "Select Location on Map"
+                        : "Change Location"}
                     </Button>
                   </div>
                 ) : (
@@ -314,7 +342,11 @@ export default function OrganizationRegisterForm() {
                     initialLng={longitude || 78.9629}
                   />
                 )}
-                {errors.latitude && <p className="text-sm text-destructive">{errors.latitude.message}</p>}
+                {errors.latitude && (
+                  <p className="text-sm text-destructive">
+                    {errors.latitude.message}
+                  </p>
+                )}
               </div>
 
               {/* Error Message */}

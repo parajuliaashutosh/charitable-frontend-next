@@ -1,4 +1,5 @@
 "use client";
+import { useGeolocation } from "@/hooks/useGeoLocation";
 import { userRegistrationSchema } from "@/schema/auth.schema";
 import authServiceRequests from "@/transport/gateway/gRPC/requests/auth/auth-requests";
 import { RegisterUserRequest } from "@/transport/gateway/gRPC/stubs/exposed-auth";
@@ -6,7 +7,7 @@ import { yupResolver } from "@hookform/resolvers/yup";
 import { Lock, Mail, Phone, User } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { MapPicker } from "../common/map-picker/map-picker";
@@ -34,6 +35,8 @@ interface IUserRegistrationData {
 
 export default function UserRegisterForm() {
   const router = useRouter();
+  const { coords, error: geoError } = useGeolocation();
+
   const [showMap, setShowMap] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -94,7 +97,7 @@ export default function UserRegisterForm() {
         description: response?.message || "Registration completed successfully",
       });
       router.push("/login?registered=true");
-    } catch (err) {
+    } catch (err: any) {
       setError("An error occurred. Please try again.");
       toast.error("Action Failed", {
         description: err?.message || "Registration failed",
@@ -103,8 +106,15 @@ export default function UserRegisterForm() {
     }
   };
 
+  useEffect(() => {
+    if (coords) {
+      setValue("latitude", coords?.lat);
+      setValue("longitude", coords?.lng);
+    }
+  }, [coords, setValue]);
+
   return (
-    <div className="bg-background py-4 px-4 max-h-[90vh] overflow-y-auto hide-scrollbar">
+    <div className="bg-background py-4 px-0 md:px-4 max-h-[90vh] overflow-y-auto w-full hide-scrollbar">
       <div className="max-w-2xl mx-auto">
         <Card>
           <CardHeader className="text-center">
