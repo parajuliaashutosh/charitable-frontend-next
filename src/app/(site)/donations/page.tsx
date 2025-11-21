@@ -46,7 +46,7 @@ export default async function DonationsPage({
           {donations.length === 0 ? (
             <Empty />
           ) : (
-            <div className="grid grid-cols-1 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+            <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6">
               {donations.map((donation) => (
                 <DonationCard key={donation.id} donation={donation} />
               ))}

@@ -64,7 +64,7 @@ export function DonationCard({ donation,
   const donationTypeLabel = donation.type === DonationType.BOOKS ? 'Educational' : 'Clothing';
   console.log(donation?.url, "donation image url");
   return (
-    <Card className="hover:shadow-lg transition-all duration-200 overflow-hidden pt-0">
+    <Card className="hover:shadow-lg transition-all duration-200 overflow-hidden pt-0 md:min-w-48">
       <DonationImage imageUrl={donation.url} title={donation.title} type={donation.type} />
       
       <CardHeader>
