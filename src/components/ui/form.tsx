@@ -1,0 +1,22 @@
+import { ReactNode } from "react"
+
+export const FormLabel = ({
+  className,
+  children,
+  required,
+}: {
+  className?: string
+  children?: ReactNode
+  required?: boolean
+}) => {
+  return (
+    <p className={` ${className} pb-1 text-[14px]`}>
+      {children}
+      <small className={`${required ? 'inline-flex' : 'hidden'} text-destructive`}>&nbsp;*</small>
+    </p>
+  )
+}
+
+export const FormError = ({ error }: { error: string | undefined }) => {
+  return <p className='text-destructive text-xs h-4'>{error}</p>
+}

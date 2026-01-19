@@ -1,0 +1,101 @@
+syntax = "proto3";
+
+option java_multiple_files = true;
+option java_package = "org.charitable.app.proto";
+option java_outer_classname = "CommonProto";
+
+message EmptyRequest {}
+
+message CommonResponse {
+  bool success = 1;
+  string message = 2;
+}
+
+enum Role {
+  ROLE_UNSPECIFIED = 0;
+  SUDO_ADMIN = 1;
+  ADMIN = 2;
+  USER = 3;
+  ORGANIZATION_SUPER_ADMIN = 4;
+  ORGANIZATION_ADMIN = 5;
+}
+
+enum AuthStatus {
+  STATUS_UNSPECIFIED = 0;
+  ACTIVE = 1;
+  INACTIVE = 2;
+  SUSPENDED = 3;
+  DELETED = 4;
+}
+
+enum DonationType {
+  DONATION_UNSPECIFIED = 0;
+  BOOKS = 1;
+  CLOTHES = 2;
+}
+
+enum DonationStatus {
+  DONATION_STATUS_UNSPECIFIED = 0;
+  AVAILABLE = 1;
+  CLAIMED = 2;
+  DONATED = 3;
+  CANCELLED = 4;
+}
+
+message Organization {
+  string name = 1;
+  string address = 2;
+  float latitude = 3;
+  float longitude = 4;
+  string govtId = 5;
+  string contactNumber = 6;
+}
+
+message User {
+  string id =1;
+  string createdAt = 2;
+  string firstName = 3;
+  string middleName = 4;
+  string lastName = 5;
+  float  latitude = 6;
+  float longitude = 7;
+}
+
+message Auth {
+  string id =1;
+  string createdAt =2;
+  string email = 3;
+  string phone = 7;
+  string isEmailVerified = 4;
+  Role role = 5;
+  AuthStatus status = 6;
+}
+
+message AuthStatusHistory {
+  string id = 1;
+  string createdAt = 2;
+  AuthStatus status = 3;
+}
+
+message AuthDetail {
+  string id =1;
+  string createdAt =2;
+  string email = 3;
+  string phone = 4;
+  string isEmailVerified = 5;
+
+  Role role = 6;
+  AuthStatus status = 7;
+
+  repeated AuthStatusHistory history = 8;
+
+  string emailVerificationToken = 9;
+  string emailVerificationPublishAt = 10;
+}
+
+message Pagination {
+  int32 page = 1;
+  int32 size = 2;
+  int32 total = 3;
+  int32 totalPages =4;
+}
