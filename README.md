@@ -1,4 +1,4 @@
-### Charitable Frontend
+# Charitable Frontend
 
 This is a frontend repo for a charity based project, where people can donate and organization can collect, claim those donations
 ## Getting Started
